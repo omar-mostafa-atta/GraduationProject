@@ -416,3 +416,5 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+Graduation project/appsettings.json
+Graduation project/appsettings.Development.json
