@@ -20,7 +20,7 @@ builder.Services
 
 //Dh el Database Configuration
 builder.Services.AddDbContext<WateenDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("OmarConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ShrookConnection")));
 
 //Dh el Email service configuration
 builder.Services.Configure<EmailSettings>(
@@ -55,6 +55,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
 
 builder.Services.AddControllers();

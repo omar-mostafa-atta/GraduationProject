@@ -1,12 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Health.Contracts.Requests.Appointments
 {
-    internal class CreateAppointmentRequest
+    public class CreateAppointmentRequest
     {
+        [Required]
+        public Guid DoctorId { get; set; }
+
+        [Required]
+        public DateTime AppointmentTime { get; set; }
+
+        [Required]
+        [RegularExpression("^(video|in_person|message)$")]
+        public string Type { get; set; }
+
+        public string? Notes { get; set; }
     }
 }

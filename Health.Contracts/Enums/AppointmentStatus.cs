@@ -8,9 +8,12 @@ namespace Health.Contracts.Enums
 {
     public enum AppointmentStatus
     {
-        Pending,
-        Confirmed,
-        Completed,
-        Cancelled
+        Pending,           // المريض حجز __الدك لسه مردش
+        Confirmed,         // الدك وافق
+        Rejected,          // الدك رفض
+        Completed,         // الميعاد خلص
+        CancelledPatient,  // المريض لغى
+        CancelledDoctor,   // الدك لغى
+        Rescheduled        // المريض بيغير مواعيد
     }
 }
