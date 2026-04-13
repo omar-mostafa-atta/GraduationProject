@@ -4,6 +4,7 @@ using Health.Contracts.Requests.Auth;
 using Health.Contracts.Requests.Users;
 using Health.Contracts.Responses.Users;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace Health.Application.Services
@@ -296,7 +297,7 @@ namespace Health.Application.Services
         }
 
         public async Task<string> DeleteUserAsync(DeleteUser request) {
-                 if (!Guid.TryParse(request.Id, out var userGuid))
+            if (!Guid.TryParse(request.Id, out var userGuid))
             {
                 throw new Exception("Invalid User ID format.");
             }
@@ -305,16 +306,31 @@ namespace Health.Application.Services
             {
                 throw new Exception("User not found.");
             }
-            if (user.Patient != null)
+            var isPatient = await _userManager.IsInRoleAsync(user, "Patient");
+            var isDoctor = await _userManager.IsInRoleAsync(user, "Doctor");
+            var isNurse = await _userManager.IsInRoleAsync(user, "Nurse");
+            if (isPatient)
             {
-                _dbContext.Patients.Remove(user.Patient);
-            }else if (user.Doctor != null)
+                var patient = await _dbContext.Patients.SingleOrDefaultAsync(p => p.Id == user.Id);
+                if (patient != null)
+                {
+                    _dbContext.Patients.Remove(patient);
+                }
+            }else if (isDoctor)
             {
-                _dbContext.Doctors.Remove(user.Doctor);
+                var doctor = await _dbContext.Doctors.SingleOrDefaultAsync(d => d.Id == user.Id);
+                if (doctor != null)
+                {
+                    _dbContext.Doctors.Remove(doctor);
+                }
             }
-            else if (user.Nurse != null)
+            else if (isNurse)
             {
-                _dbContext.Nurses.Remove(user.Nurse);
+                var nurse = await _dbContext.Nurses.SingleOrDefaultAsync(n => n.Id == user.Id);
+                if (nurse != null)
+                {
+                    _dbContext.Nurses.Remove(nurse);
+                }
             }
             var result = await _userManager.DeleteAsync(user);
 

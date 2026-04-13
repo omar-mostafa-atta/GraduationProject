@@ -36,7 +36,7 @@ namespace Graduation_project.Controllers
 
         // المريض يشوف مواعيده
         // GET: api/Appointment/my
-        [HttpGet("my")]
+        [HttpGet("Patient")]
         [Authorize(Roles = "Patient")]
         public async Task<IActionResult> GetMyAppointments()
         {
