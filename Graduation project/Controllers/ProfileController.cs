@@ -18,8 +18,8 @@ namespace Graduation_project.Controllers
             _profileService = profileService;
         }
 
-        [HttpPut("update/Doctor-Nurse")]
-        [Authorize(Roles = "Doctor,Nurse")]
+        [HttpPut("doctorNurse")]
+        [Authorize(Roles = "Doctor,Nurse,Admin")]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -31,7 +31,7 @@ namespace Graduation_project.Controllers
             return BadRequest(new { response.Message });
         }
 
-        [HttpPut("update/patient")]
+        [HttpPut("patient")]
         [Authorize(Roles = "Patient")]
         public async Task<IActionResult> UpdatePatientProfile([FromBody] UpdatePatientProfileRequest request)
         {
@@ -42,6 +42,17 @@ namespace Graduation_project.Controllers
 
             if (response.IsSuccess) return Ok(response);
             return BadRequest(new { response.Message });
+        }
+
+        [HttpGet("patientData")]
+        [Authorize(Roles = "Patient")]
+        public async Task<IActionResult> GetPatientData()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized("User Not Found");
+            var patientData = await _profileService.GetPatientDataAsync(Guid.Parse(userId));
+            if (patientData == null) return NotFound("No Data was found for this user in the database");
+            return Ok(patientData);
         }
     }
 }

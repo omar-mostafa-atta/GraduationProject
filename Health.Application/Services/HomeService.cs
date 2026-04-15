@@ -243,5 +243,10 @@ namespace Health.Application.Services
 
 
         }
+
+        public async Task<List<Nurse>> GetNursesAsync()
+        {
+            return await _dbContext.Nurses.Include(n => n.User).ToListAsync();
+        }
     }
 }

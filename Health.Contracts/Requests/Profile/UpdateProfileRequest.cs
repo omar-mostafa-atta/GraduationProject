@@ -20,5 +20,9 @@ namespace Health.Contracts.Requests.Profile
 
         public DateTime? DateOfBirth { get; set; }
         public string? Address { get; set; }
+        public int? SystolicPressure { get; set; }
+        public int? DiastolicPressure { get; set; }
+        public int? HeartRate { get; set; }
+        public int? Sugar { get; set; }
     }
 }

@@ -19,6 +19,12 @@ namespace Health.Application.Models
         public string Gender { get; set; }
 
         public string? Address { get; set; }
+        public string PhoneNumber { get; set; }
+
+        public int? SystolicPressure { get; set; }
+        public int? DiastolicPressure { get; set; }
+        public int? HeartRate { get; set; }
+        public int? Sugar { get; set; }
 
         public User User { get; set; }
     }

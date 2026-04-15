@@ -104,5 +104,23 @@ namespace Graduation_project.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+
+
+        [HttpGet("Nurses")]
+        [Authorize]
+        public async Task<IActionResult> GetNurses()
+        {
+            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //if (string.IsNullOrEmpty(userId)) return Unauthorized();
+            try
+            {
+                var response = await _homeService.GetNursesAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
     }
 }

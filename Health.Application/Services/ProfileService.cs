@@ -18,6 +18,12 @@ namespace Health.Application.Services
             _dbContext = dbContext;
         }
 
+        public async Task<Patient> GetPatientDataAsync(Guid userId)
+        {
+            var patient = await _dbContext.Patients.FirstOrDefaultAsync(p => p.Id == userId);
+            return patient;
+        }
+
         public async Task<UpdateProfileResponse> UpdateProfileAsync(Guid userId, UpdateProfileRequest request)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -93,7 +99,7 @@ namespace Health.Application.Services
                     return new UpdateProfileResponse { IsSuccess = false, Message = "Email already in use." };
 
                 user.Email = request.Email;
-                user.UserName = request.Email;
+                //user.UserName = request.Email;
             }
 
             if (!string.IsNullOrWhiteSpace(request.FirstName)) user.FirstName = request.FirstName;
@@ -114,6 +120,10 @@ namespace Health.Application.Services
                 //if (!string.IsNullOrWhiteSpace(request.Gender)) patient.Gender = request.Gender;
                 if (request.DateOfBirth.HasValue) patient.DateOfBirth = request.DateOfBirth;
                 if (!string.IsNullOrWhiteSpace(request.Address)) patient.Address = request.Address;
+                if (request.SystolicPressure.HasValue) patient.SystolicPressure = request.SystolicPressure.Value;
+                if (request.DiastolicPressure.HasValue) patient.DiastolicPressure = request.DiastolicPressure.Value;
+                if (request.HeartRate.HasValue) patient.HeartRate = request.HeartRate.Value;
+                if (request.Sugar.HasValue) patient.Sugar = request.Sugar.Value;
             }
 
             await _dbContext.SaveChangesAsync();
@@ -125,7 +135,8 @@ namespace Health.Application.Services
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                ProfilePictureUrl = user.ProfilePictureUrl
+                ProfilePictureUrl = user.ProfilePictureUrl,
+
             };
         }
     }

@@ -44,6 +44,7 @@ namespace Health.Application.Services
                 FirstName = request.FirstName,
                 UserName = request.FirstName + request.LastName,
                 LastName = request.LastName,
+                PhoneNumber= request.PhoneNumber,
                 EmailConfirmed = true           
             };
 
@@ -61,6 +62,7 @@ namespace Health.Application.Services
                     Email= request.Email,
                     Gender = request.Gender,
                     User = user ,
+                    PhoneNumber = request.PhoneNumber,
                     DateOfBirth = request.DateOfBirth
                 };
 

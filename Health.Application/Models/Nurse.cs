@@ -20,6 +20,8 @@ namespace Health.Application.Models
         public bool IsActive { get; set; }
         public int CompletedRequests { get; set; } = 0;
 
+        public string? Government { get; set; }=null;
+
         public NurseStatus Status { get; set; }= NurseStatus.Pending;
 
         public ICollection<HomeServiceRequest> HomeServiceRequests { get; set; }
