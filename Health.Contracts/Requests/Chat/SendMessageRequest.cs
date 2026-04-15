@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Health.Contracts.Requests.Chat
 {
-    internal class SendMessageRequest
+    public class SendMessageRequest
     {
+        public Guid ReceiverId { get; set; }
+        public string MessageContent { get; set; }
     }
 }
