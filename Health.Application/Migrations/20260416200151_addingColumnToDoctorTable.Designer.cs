@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Health.Application.Migrations
 {
     [DbContext(typeof(WateenDbContext))]
-    partial class WateenDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260416200151_addingColumnToDoctorTable")]
+    partial class addingColumnToDoctorTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -119,6 +122,7 @@ namespace Health.Application.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AvailabilitySchedule")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Bio")
@@ -131,11 +135,14 @@ namespace Health.Application.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ExperienceYears")
+                    b.Property<int?>("ExperienceYears")
                         .HasColumnType("int");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Hospital")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
@@ -159,9 +166,6 @@ namespace Health.Application.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<string>("WorkPlace")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

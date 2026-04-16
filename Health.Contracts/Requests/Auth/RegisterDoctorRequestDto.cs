@@ -16,12 +16,11 @@ namespace Health.Contracts.Requests.Auth
         [Required]
         public string LicenseNumber { get; set; }
 
-        public string? Bio { get; set; } // Nullable
-
         [Required]
-        public string DoctorPhoneNumber { get; set; } 
-
+        public string PhoneNumber { get; set; }
         [Required]
-        public string AvailabilitySchedule { get; set; }
+        public string WorkPlace { get; set; }
+        [Required]
+        public int ExperienceYears { get; set; }
     }
 }

@@ -16,8 +16,7 @@ namespace Health.Contracts.Requests.Profile
     public class UpdatePatientProfileRequest : UpdateProfileRequest
     {
         [RegularExpression("^(Male|Female|male|female)$", ErrorMessage = "Gender must be 'Male' or 'Female'.")]
-        //public string? Gender { get; set; }
-
+        public string? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? Address { get; set; }
         public int? SystolicPressure { get; set; }

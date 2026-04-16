@@ -110,8 +110,8 @@ namespace Graduation_project.Controllers
         [Authorize]
         public async Task<IActionResult> GetNurses()
         {
-            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //if (string.IsNullOrEmpty(userId)) return Unauthorized();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
             try
             {
                 var response = await _homeService.GetNursesAsync();

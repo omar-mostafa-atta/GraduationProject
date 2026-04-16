@@ -117,7 +117,7 @@ namespace Health.Application.Services
                 if (!string.IsNullOrWhiteSpace(request.LastName)) patient.LastName = request.LastName;
                 if (!string.IsNullOrWhiteSpace(request.Email)) patient.Email = request.Email;
                 if (!string.IsNullOrWhiteSpace(request.ProfilePictureUrl)) patient.ProfilePictureUrl = request.ProfilePictureUrl;
-                //if (!string.IsNullOrWhiteSpace(request.Gender)) patient.Gender = request.Gender;
+                if (!string.IsNullOrWhiteSpace(request.Gender)) patient.Gender = request.Gender;
                 if (request.DateOfBirth.HasValue) patient.DateOfBirth = request.DateOfBirth;
                 if (!string.IsNullOrWhiteSpace(request.Address)) patient.Address = request.Address;
                 if (request.SystolicPressure.HasValue) patient.SystolicPressure = request.SystolicPressure.Value;

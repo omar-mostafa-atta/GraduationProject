@@ -1,4 +1,5 @@
-﻿using Health.Contracts.Requests.Appointments;
+﻿using Health.Application.Models;
+using Health.Contracts.Requests.Appointments;
 
 namespace Health.Application.IServices
 {
@@ -12,5 +13,6 @@ namespace Health.Application.IServices
         Task<AppointmentResponse> CancelByDoctorAsync(string doctorUserId, Guid appointmentId);
         Task<AppointmentResponse> RescheduleByPatientAsync(string patientUserId, Guid appointmentId, RescheduleAppointmentRequest request);
         Task<AppointmentResponse> CompleteAppointmentAsync(string doctorUserId, Guid appointmentId);
+        Task<List<Doctor>> GetDoctorAsync();
     }
 }

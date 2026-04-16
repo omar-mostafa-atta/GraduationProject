@@ -289,5 +289,11 @@ namespace Health.Application.Services
                 CreatedAt = a.CreatedAt
             };
         }
+
+        public async Task<List<Doctor>> GetDoctorAsync()
+        {
+            var doctors = await _dbContext.Doctors.ToListAsync();
+            return doctors;
+        }
     }
 }

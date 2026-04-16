@@ -145,5 +145,23 @@ namespace Graduation_project.Controllers
             }
             catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
         }
+
+        [HttpGet("Doctors")]
+        [Authorize]
+        public async Task<IActionResult> GetDoctors()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+            try
+            {
+                var response = await _appointmentService.GetDoctorAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
     }
 }

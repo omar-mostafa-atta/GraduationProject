@@ -107,7 +107,7 @@ namespace Health.Application.Services
                 UserName = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                PhoneNumber = request.DoctorPhoneNumber, 
+                PhoneNumber = request.PhoneNumber, 
                 EmailConfirmed = true
             };
 
@@ -121,22 +121,34 @@ namespace Health.Application.Services
 
                 var doctor = new Doctor
                 {
-                  
+                    FirstName= request.FirstName,
+                    LastName = request.LastName,
                     Specialization = request.Specialization,
                     LicenseNumber = request.LicenseNumber,
-                    Bio = request.Bio,
-                    PhoneNumber = request.DoctorPhoneNumber,
-                    AvailabilitySchedule = request.AvailabilitySchedule,
+                    PhoneNumber = request.PhoneNumber,
+                    WorkPlace = request.WorkPlace,
+                    ExperienceYears = request.ExperienceYears,
                     Email = request.Email,
                     Status = DoctorStatus.Pending,
                     User = user
                 };
 
-                
-                _dbContext.Doctors.Add(doctor);
+                try
+                {
+                    _dbContext.Doctors.Add(doctor);
 
-          
-                await _dbContext.SaveChangesAsync();
+
+                    await _dbContext.SaveChangesAsync();
+                }
+                catch
+                {
+                    await _userManager.DeleteAsync(user);
+                    await _dbContext.SaveChangesAsync();
+
+                    throw new Exception("An error occurred while saving the doctor information. Please try again.");
+
+                }
+           
 
                 // 4. Generate Token and Response
                 return new AuthResponseDto
@@ -149,7 +161,7 @@ namespace Health.Application.Services
                     IsSuccess = true
                 };
             }
-
+        
             return new AuthResponseDto
             {
                 IsSuccess = false,

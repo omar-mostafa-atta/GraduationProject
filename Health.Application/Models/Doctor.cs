@@ -16,9 +16,10 @@ namespace Health.Application.Models
         public string LicenseNumber { get; set; }
         public string? Bio { get; set; } 
         public string PhoneNumber { get; set; }
-        public string AvailabilitySchedule { get; set; }
+        public string? AvailabilitySchedule { get; set; }
         public int ExperienceYears { get; set; }
 
+        public string? WorkPlace { get; set; }
         public DoctorStatus Status { get; set; }= DoctorStatus.Pending;
         public User User { get; set; }
 
