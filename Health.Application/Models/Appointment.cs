@@ -25,7 +25,9 @@ namespace Health.Application.Models
         public string? Notes { get; set; }
         public string? VideoCallLink { get; set; }
         public string? RescheduleReason { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;// وقت مايحجز يتحفظ
+        public string? CalendlyEventUri { get; set; }  // tracks which Calendly event this is
+        public string? CalendlyJoinUrl { get; set; }  // video link from Calendly
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 
 }

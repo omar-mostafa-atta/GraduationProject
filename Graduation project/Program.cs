@@ -72,6 +72,8 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<ICalendlyService, CalendlyService>();
 builder.Services.AddSignalR();
 
 builder.Services.AddControllers();
@@ -110,21 +112,21 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins("https://localhost:7131", "http://localhost:7131", "null")
-                                .AllowAnyHeader()
-                                .AllowAnyMethod()
-                                .AllowCredentials();
-                      });
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+
+
 });
 
 
 var app = builder.Build();
 
 
-app.UseCors(MyAllowSpecificOrigins);
+app.UseCors("AllowAll");
 app.MapHub<ChatHub>("/hubs/chat");
 
 using (var scope = app.Services.CreateScope())

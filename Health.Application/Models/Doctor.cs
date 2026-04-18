@@ -21,6 +21,15 @@ namespace Health.Application.Models
 
         public string? WorkPlace { get; set; }
         public DoctorStatus Status { get; set; }= DoctorStatus.Pending;
+
+        //34an calendy integration 
+        public string? CalendlyAccessToken { get; set; }
+        public string? CalendlyRefreshToken { get; set; }
+        public string? CalendlyUri { get; set; }          
+        public string? CalendlySchedulingUrl { get; set; }
+        public string? CalendlyOrganizationUri { get; set; }
+        public bool IsCalendlyConnected => !string.IsNullOrEmpty(CalendlyUri);
+
         public User User { get; set; }
 
         public ICollection<Appointment> Appointments { get; set; }
