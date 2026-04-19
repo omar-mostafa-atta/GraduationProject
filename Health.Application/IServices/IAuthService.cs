@@ -19,5 +19,7 @@ namespace Health.Application.IServices
         Task<bool> ForgotPasswordAsync(ForgotPasswordRequestDto request);
         Task<bool> ResetPasswordAsync(ResetPasswordRequestDto request);
         Task<bool> ChangePasswordAsync(string userId, ChangePasswordRequestDto request);
+
+        Task<bool> AcceptRejectAsync(string userId, bool isAccepted);
     }
 }

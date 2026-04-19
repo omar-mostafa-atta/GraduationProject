@@ -370,5 +370,28 @@ namespace Health.Application.Services
             var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
             return result.Succeeded;
         }
+
+        public async Task<bool> AcceptRejectAsync(string userId, bool isAccepted)
+        {
+            if (!Guid.TryParse(userId, out var userGuid))
+            {
+                throw new Exception("Invalid User ID format.");
+            }
+            var doctor = await _dbContext.Doctors.SingleOrDefaultAsync(d => d.User.Id == userGuid);
+            if (doctor != null)
+            {
+                doctor.Status = isAccepted ? DoctorStatus.Approved : DoctorStatus.Rejected;
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            var nurse = await _dbContext.Nurses.SingleOrDefaultAsync(n => n.User.Id == userGuid);
+            if (nurse != null)
+            {
+                nurse.Status = isAccepted ? NurseStatus.Approved : NurseStatus.Rejected;
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
     }
 }

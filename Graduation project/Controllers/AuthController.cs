@@ -133,5 +133,17 @@ namespace Graduation_project.Controllers
             }
             return BadRequest(new { Message = "Current password is incorrect." });
         }
+
+        [HttpPost("accept-reject")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AcceptReject([FromBody] AcceptRejectRequestDto model)
+        {
+            var response = await _authService.AcceptRejectAsync(model.UserId, model.IsAccepted);
+            if (response)
+            {
+                return Ok(new { Message = "User status has been successfully updated." });
+            }
+            return BadRequest(new { Message = "Failed to update user status." });
+        }
     }
 }

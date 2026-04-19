@@ -1,5 +1,4 @@
-﻿// Infrastructure/Services/PhotoService.cs
-using CloudinaryDotNet;
+﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Health.Application.IServices;
 using Health.Application.Settings;
@@ -41,14 +40,14 @@ namespace Health.Application.Services
             var uploadParams = new ImageUploadParams
             {
                 File = new FileDescription(file.FileName, stream),
-                PublicId = $"profile_pictures/{userId}",  // overwrites previous photo automatically
+                PublicId = $"profile_pictures/{userId}", 
                 Overwrite = true,
                 Transformation = new Transformation()
                     .Width(300).Height(300)
                     .Crop("fill")
-                    .Gravity("face")     // auto-center on face
+                    .Gravity("face")   
                     .Quality("auto")
-                    .FetchFormat("auto") // serves WebP to supported browsers
+                    .FetchFormat("auto")
             };
 
             var result = await _cloudinary.UploadAsync(uploadParams);
