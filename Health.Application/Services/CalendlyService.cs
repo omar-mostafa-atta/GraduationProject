@@ -139,8 +139,8 @@ namespace Health.Application.Services
         public async Task ProcessWebhookAsync(string body, string signature)
         {
             // Verify it's really from Calendly
-            //if (!VerifySignature(body, signature))
-            //    throw new UnauthorizedAccessException("Invalid Calendly webhook signature.");
+            if (!VerifySignature(body, signature))
+               throw new UnauthorizedAccessException("Invalid Calendly webhook signature.");
 
             var payload = JsonSerializer.Deserialize<CalendlyWebhookPayload>(body,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -206,7 +206,8 @@ namespace Health.Application.Services
             Console.WriteLine($"=== HANDLE BOOKING CREATED ===");
             Console.WriteLine($"Patient email from Calendly: {payload.Email}");
 
-            var doctorCalendlyUri = payload.Event.EventMemberships.FirstOrDefault()?.UserUri;
+            // Use ScheduledEvent here!
+            var doctorCalendlyUri = payload.ScheduledEvent.EventMemberships.FirstOrDefault()?.UserUri;
             Console.WriteLine($"Doctor Calendly URI: {doctorCalendlyUri}");
 
             var doctor = await _dbContext.Doctors
@@ -221,11 +222,11 @@ namespace Health.Application.Services
                 .FirstOrDefaultAsync(p => p.User.Email == payload.Email);
 
             Console.WriteLine($"Patient found: {patient != null}");
-            // 👇 If this prints false — the email doesn't match any patient in DB
             if (patient == null) return;
 
             var exists = await _dbContext.Appointments
-                .AnyAsync(a => a.CalendlyEventUri == payload.Event.Uri);
+                .AnyAsync(a => a.CalendlyEventUri == payload.ScheduledEvent.Uri);
+
             Console.WriteLine($"Appointment already exists: {exists}");
             if (exists) return;
 
@@ -234,13 +235,13 @@ namespace Health.Application.Services
                 Id = Guid.NewGuid(),
                 PatientId = patient.Id,
                 DoctorId = doctor.Id,
-                AppointmentTime = payload.Event.StartTime,
+                AppointmentTime = payload.ScheduledEvent.StartTime,
                 Type = "video",
                 Status = AppointmentStatus.Confirmed,
                 Notes = payload.QuestionsAndAnswers.FirstOrDefault()?.Answer,
-                CalendlyEventUri = payload.Event.Uri,
-                CalendlyJoinUrl = payload.Event.Location?.JoinUrl,
-                VideoCallLink = payload.Event.Location?.JoinUrl,
+                CalendlyEventUri = payload.ScheduledEvent.Uri,
+                CalendlyJoinUrl = payload.ScheduledEvent.Location?.JoinUrl,
+                VideoCallLink = payload.ScheduledEvent.Location?.JoinUrl,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -252,7 +253,7 @@ namespace Health.Application.Services
         private async Task HandleBookingCancelledAsync(CalendlyInviteePayload payload)
         {
             var appointment = await _dbContext.Appointments
-                .FirstOrDefaultAsync(a => a.CalendlyEventUri == payload.Event.Uri);
+        .FirstOrDefaultAsync(a => a.CalendlyEventUri == payload.EventUri);
 
             if (appointment == null) return;
 

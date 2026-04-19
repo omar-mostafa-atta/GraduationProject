@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Health.Application.Migrations
 {
     [DbContext(typeof(WateenDbContext))]
-    [Migration("20260416201703_MakeSchedualeNullable")]
-    partial class MakeSchedualeNullable
+    [Migration("20260418032941_theWholeDatabase")]
+    partial class theWholeDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,6 +60,12 @@ namespace Health.Application.Migrations
 
                     b.Property<DateTime>("AppointmentTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("CalendlyEventUri")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CalendlyJoinUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -125,6 +131,21 @@ namespace Health.Application.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Bio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CalendlyAccessToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CalendlyOrganizationUri")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CalendlyRefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CalendlySchedulingUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CalendlyUri")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")

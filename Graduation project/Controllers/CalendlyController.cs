@@ -129,6 +129,8 @@ namespace Graduation_project.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"=== WEBHOOK ERROR: {ex.Message}");
+                Console.WriteLine($"=== STACK: {ex.StackTrace}");
                 return BadRequest(new { Message = ex.Message });
             }
         }

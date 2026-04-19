@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Health.Application.Migrations
 {
     /// <inheritdoc />
-    public partial class testDeploy : Migration
+    public partial class theWholeDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -194,8 +194,15 @@ namespace Health.Application.Migrations
                     LicenseNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AvailabilitySchedule = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AvailabilitySchedule = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExperienceYears = table.Column<int>(type: "int", nullable: false),
+                    WorkPlace = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    CalendlyAccessToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CalendlyRefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CalendlyUri = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CalendlySchedulingUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CalendlyOrganizationUri = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProfilePictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -246,6 +253,8 @@ namespace Health.Application.Migrations
                     ExperienceYears = table.Column<int>(type: "int", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CompletedRequests = table.Column<int>(type: "int", nullable: false),
+                    Government = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -272,6 +281,11 @@ namespace Health.Application.Migrations
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SystolicPressure = table.Column<int>(type: "int", nullable: true),
+                    DiastolicPressure = table.Column<int>(type: "int", nullable: true),
+                    HeartRate = table.Column<int>(type: "int", nullable: true),
+                    Sugar = table.Column<int>(type: "int", nullable: true),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProfilePictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -332,9 +346,14 @@ namespace Health.Application.Migrations
                     PatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DoctorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AppointmentTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    VideoCallLink = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VideoCallLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RescheduleReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CalendlyEventUri = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CalendlyJoinUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -9,9 +9,19 @@ namespace Health.Contracts.Calendy
 {
     public class CalendlyInviteePayload
     {
-        [JsonPropertyName("email")] public string Email { get; set; } = "";
-        [JsonPropertyName("name")] public string Name { get; set; } = "";
-        [JsonPropertyName("event")] public CalendlyEventDetail Event { get; set; } = new();
+        [JsonPropertyName("email")]
+        public string Email { get; set; } = "";
+
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = "";
+
+     
+        [JsonPropertyName("event")]
+        public string EventUri { get; set; } = "";
+
+        [JsonPropertyName("scheduled_event")]
+        public CalendlyEventDetail ScheduledEvent { get; set; } = new();
+
         [JsonPropertyName("questions_and_answers")]
         public List<QnA> QuestionsAndAnswers { get; set; } = new();
     }
