@@ -120,5 +120,18 @@ namespace Graduation_project.Controllers
             return Ok(response);
 
         }
+
+        [HttpPost("change/password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isSuccess = await _authService.ChangePasswordAsync(userId, model);
+            if (isSuccess)
+            {
+                return Ok(new { Message = "Password has been successfully changed." });
+            }
+            return BadRequest(new { Message = "Current password is incorrect." });
+        }
     }
 }

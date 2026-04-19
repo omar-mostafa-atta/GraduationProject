@@ -14,10 +14,10 @@ namespace Health.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ITokenService _tokenService;
-        private readonly IEmailService _emailService; 
+        private readonly IEmailService _emailService;
         private readonly WateenDbContext _dbContext;
 
-        public AuthService(UserManager<User> userManager, 
+        public AuthService(UserManager<User> userManager,
             SignInManager<User> signInManager,
             ITokenService tokenService,
             IEmailService emailService,
@@ -27,7 +27,7 @@ namespace Health.Application.Services
             _signInManager = signInManager;
             _tokenService = tokenService;
             _emailService = emailService;
-            _dbContext= dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<AuthResponseDto> RegisterPatientAsync(RegisterPatientRequestDto request)
@@ -44,35 +44,35 @@ namespace Health.Application.Services
                 FirstName = request.FirstName,
                 UserName = request.FirstName + request.LastName,
                 LastName = request.LastName,
-                PhoneNumber= request.PhoneNumber,
-                EmailConfirmed = true           
+                PhoneNumber = request.PhoneNumber,
+                EmailConfirmed = true
             };
 
             var result = await _userManager.CreateAsync(user, request.Password);
 
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user,"Patient");
+                await _userManager.AddToRoleAsync(user, "Patient");
 
-              
+
                 var patient = new Patient
                 {
                     FirstName = request.FirstName,
                     LastName = request.LastName,
-                    Email= request.Email,
+                    Email = request.Email,
                     Gender = request.Gender,
-                    User = user ,
+                    User = user,
                     PhoneNumber = request.PhoneNumber,
                     DateOfBirth = request.DateOfBirth
                 };
 
-            
+
                 _dbContext.Patients.Add(patient);
 
 
                 await _dbContext.SaveChangesAsync();
 
-               
+
                 return new AuthResponseDto
                 {
                     UserId = user.Id,
@@ -100,14 +100,14 @@ namespace Health.Application.Services
                 return new AuthResponseDto { IsSuccess = false, Errors = new[] { "User with this email already exists." } };
             }
 
-       
+
             var user = new User
             {
                 Email = request.Email,
                 UserName = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                PhoneNumber = request.PhoneNumber, 
+                PhoneNumber = request.PhoneNumber,
                 EmailConfirmed = true
             };
 
@@ -115,13 +115,13 @@ namespace Health.Application.Services
 
             if (result.Succeeded)
             {
-              
+
                 const string doctorRole = "Doctor";
                 await _userManager.AddToRoleAsync(user, doctorRole);
 
                 var doctor = new Doctor
                 {
-                    FirstName= request.FirstName,
+                    FirstName = request.FirstName,
                     LastName = request.LastName,
                     Specialization = request.Specialization,
                     LicenseNumber = request.LicenseNumber,
@@ -148,7 +148,7 @@ namespace Health.Application.Services
                     throw new Exception("An error occurred while saving the doctor information. Please try again.");
 
                 }
-           
+
 
                 // 4. Generate Token and Response
                 return new AuthResponseDto
@@ -161,7 +161,7 @@ namespace Health.Application.Services
                     IsSuccess = true
                 };
             }
-        
+
             return new AuthResponseDto
             {
                 IsSuccess = false,
@@ -215,7 +215,7 @@ namespace Health.Application.Services
 
                 await _dbContext.SaveChangesAsync();
 
-            
+
                 return new AuthResponseDto
                 {
                     UserId = user.Id,
@@ -244,19 +244,19 @@ namespace Health.Application.Services
             {
                 return new AuthResponseDto { IsSuccess = false, Errors = new[] { "Invalid credentials." } };
             }
-           
+
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
 
             if (result.Succeeded)
             {
-              var roles =  await _userManager.GetRolesAsync(user);
+                var roles = await _userManager.GetRolesAsync(user);
 
                 if (roles.Contains("Doctor"))
                 {
                     var doctor = _dbContext.Doctors.SingleOrDefault(d => d.User.Id == user.Id);
                     if (doctor == null || doctor.Status != DoctorStatus.Approved)
                     {
-                        
+
                         return new AuthResponseDto { IsSuccess = false, Errors = new[] { "Your Doctor account is pending approval or has been rejected." } };
                     }
                 }
@@ -304,13 +304,14 @@ namespace Health.Application.Services
 
             var decodedToken = System.Net.WebUtility.UrlDecode(tokenFromRequest);
 
-         
+
             var result = await _userManager.ResetPasswordAsync(user, decodedToken, request.NewPassword);
 
             return result.Succeeded;
         }
 
-        public async Task<string> DeleteUserAsync(DeleteUser request) {
+        public async Task<string> DeleteUserAsync(DeleteUser request)
+        {
             if (!Guid.TryParse(request.Id, out var userGuid))
             {
                 throw new Exception("Invalid User ID format.");
@@ -330,7 +331,8 @@ namespace Health.Application.Services
                 {
                     _dbContext.Patients.Remove(patient);
                 }
-            }else if (isDoctor)
+            }
+            else if (isDoctor)
             {
                 var doctor = await _dbContext.Doctors.SingleOrDefaultAsync(d => d.Id == user.Id);
                 if (doctor != null)
@@ -356,6 +358,17 @@ namespace Health.Application.Services
             throw new Exception($"Failed to delete user: {errors}");
 
 
+        }
+
+        public async Task<bool> ChangePasswordAsync(string userId, ChangePasswordRequestDto request)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return false;
+            }
+            var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+            return result.Succeeded;
         }
     }
 }
