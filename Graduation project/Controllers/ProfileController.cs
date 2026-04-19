@@ -1,6 +1,8 @@
 ﻿using Health.Application.IServices;
+using Health.Application.Models;
 using Health.Contracts.Requests.Profile;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -12,10 +14,13 @@ namespace Graduation_project.Controllers
     public class ProfileController : ControllerBase
     {
         private readonly IProfileService _profileService;
-
-        public ProfileController(IProfileService profileService)
+        private readonly IPhotoService _photoService;
+        private readonly UserManager<User> _userManager;
+        public ProfileController(IProfileService profileService, IPhotoService photoService, UserManager<User> userManager)
         {
             _profileService = profileService;
+            _photoService = photoService;
+            _userManager = userManager;
         }
 
         [HttpPut("doctorNurse")]
@@ -53,6 +58,45 @@ namespace Graduation_project.Controllers
             var patientData = await _profileService.GetPatientDataAsync(Guid.Parse(userId));
             if (patientData == null) return NotFound("No Data was found for this user in the database");
             return Ok(patientData);
+        }
+
+        [HttpPut("profile-picture")]
+        public async Task<IActionResult> UploadProfilePicture(IFormFile file)
+        {
+           
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound("User not found.");
+
+            try
+            {
+                var imageUrl = await _photoService.UploadProfilePictureAsync(file, userId);
+
+                user.ProfilePictureUrl = imageUrl;
+                await _userManager.UpdateAsync(user);
+
+                return Ok(new { profilePictureUrl = imageUrl });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+            var profile = await _profileService.GetProfileAsync(Guid.Parse(userId));
+            if (profile == null) return NotFound("Profile not found.");
+            return Ok(profile);
         }
     }
 }

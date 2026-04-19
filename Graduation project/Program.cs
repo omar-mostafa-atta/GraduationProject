@@ -3,6 +3,7 @@ using Health.Application;
 using Health.Application.IServices;
 using Health.Application.Models;
 using Health.Application.Services;
+using Health.Application.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ builder.Services
 
 //Dh el Database Configuration
 builder.Services.AddDbContext<WateenDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MonsterAsp")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("OmarConnection")));
 
 //Dh el Email service configuration
 builder.Services.Configure<EmailSettings>(
@@ -72,8 +73,11 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IChatService, ChatService>();
-builder.Services.AddHttpClient();
 builder.Services.AddScoped<ICalendlyService, CalendlyService>();
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+
+builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
 
 builder.Services.AddControllers();

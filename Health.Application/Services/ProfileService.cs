@@ -139,5 +139,11 @@ namespace Health.Application.Services
 
             };
         }
+
+        public async Task<User> GetProfileAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            return user;
+        }
     }
 }
