@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Health.Contracts.Requests.Nurses
+﻿namespace Health.Contracts.Requests.Nurses
 {
-    internal class NurseResponse
+    public class NurseResponse
     {
+        public Guid Id { get; set; }
+        public string FullName { get; set; }
+        public string? Specialization { get; set; }
+        public int ExperienceYears { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+        public string? PhoneNumber { get; set; }
     }
 }

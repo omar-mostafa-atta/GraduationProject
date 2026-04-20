@@ -39,37 +39,31 @@ namespace Graduation_project.Controllers
 
         [HttpGet("PatientRequests")]
         [Authorize(Roles = "Patient")]
-        public async Task<IActionResult> GetPatientRequests()
+        public async Task<IActionResult> GetPatientRequests([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
             try
             {
-                var response = await _homeService.GetPatientRequestsAsync(userId);
+                var response = await _homeService.GetPatientRequestsAsync(userId, pageNumber, pageSize);
                 return Ok(response);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
         }
 
 
         [HttpGet("NurseRequests")]
         [Authorize(Roles = "Nurse")]
-        public async Task<IActionResult> GetNurseRequests()
+        public async Task<IActionResult> GetNurseRequests([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
             try
             {
-                var response = await _homeService.GetNurseRequestsAsync(userId);
+                var response = await _homeService.GetNurseRequestsAsync(userId, pageNumber, pageSize);
                 return Ok(response);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
         }
 
         [HttpPut("UpdateStatus/{requestId}")]
@@ -106,15 +100,31 @@ namespace Graduation_project.Controllers
         }
 
 
+        //[HttpGet("Nurses")]
+        //[Authorize]
+        //public async Task<IActionResult> GetNurses()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId)) return Unauthorized();
+        //    try
+        //    {
+        //        var response = await _homeService.GetNursesAsync();
+        //        return Ok(response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { Message = ex.Message });
+        //    }
+        //}
         [HttpGet("Nurses")]
         [Authorize]
-        public async Task<IActionResult> GetNurses()
+        public async Task<IActionResult> GetNurses([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
             try
             {
-                var response = await _homeService.GetNursesAsync();
+                var response = await _homeService.GetNursesAsync(pageNumber, pageSize);
                 return Ok(response);
             }
             catch (Exception ex)

@@ -1,5 +1,6 @@
 ﻿using Health.Application.IServices;
 using Health.Application.Models;
+using Health.Contracts.Common;
 using Health.Contracts.Requests.Chat;
 using Health.Contracts.Responses.Chat;
 using Microsoft.EntityFrameworkCore;
@@ -82,11 +83,17 @@ namespace Health.Application.Services
             return messages.Select(m => MapToMessageResponse(m, m.Sender)).ToList();
         }
 
-        public async Task<List<ChatResponse>> GetAllChatsAsync(Guid currentUserId)
+        public async Task<PaginatedResponse<ChatResponse>> GetAllChatsAsync(Guid currentUserId, int pageNumber, int pageSize)
         {
+            var totalCount = await _dbContext.Chats
+                .Where(c => c.FirstUserId == currentUserId || c.SecondUserId == currentUserId)
+                .CountAsync();
+
             var chats = await _dbContext.Chats
                 .Where(c => c.FirstUserId == currentUserId || c.SecondUserId == currentUserId)
                 .Include(c => c.Messages)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             var result = new List<ChatResponse>();
@@ -112,7 +119,13 @@ namespace Health.Application.Services
                 });
             }
 
-            return result.OrderByDescending(c => c.LastMessage?.SentAt).ToList();
+            return new PaginatedResponse<ChatResponse>
+            {
+                Data = result.OrderByDescending(c => c.LastMessage?.SentAt).ToList(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
 
         public async Task MarkMessagesAsReadAsync(Guid currentUserId, Guid otherUserId)

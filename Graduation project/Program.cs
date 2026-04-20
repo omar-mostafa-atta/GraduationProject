@@ -22,7 +22,7 @@ builder.Services
 
 //Dh el Database Configuration
 builder.Services.AddDbContext<WateenDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MonsterAsp")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ShrookConnection")));
 
 //Dh el Email service configuration
 builder.Services.Configure<EmailSettings>(

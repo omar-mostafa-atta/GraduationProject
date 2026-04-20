@@ -38,13 +38,14 @@ namespace Graduation_project.Controllers
         // GET: api/Appointment/my
         [HttpGet("Patient")]
         [Authorize(Roles = "Patient")]
-        public async Task<IActionResult> GetMyAppointments()
+        
+        public async Task<IActionResult> GetMyAppointments([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
             try
             {
-                var response = await _appointmentService.GetPatientAppointmentsAsync(userId);
+                var response = await _appointmentService.GetPatientAppointmentsAsync(userId, pageNumber, pageSize);
                 return Ok(response);
             }
             catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
@@ -54,13 +55,14 @@ namespace Graduation_project.Controllers
         // GET: api/Appointment/doctor
         [HttpGet("doctor")]
         [Authorize(Roles = "Doctor")]
-        public async Task<IActionResult> GetDoctorAppointments()
+        
+        public async Task<IActionResult> GetDoctorAppointments([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
             try
             {
-                var response = await _appointmentService.GetDoctorAppointmentsAsync(userId);
+                var response = await _appointmentService.GetDoctorAppointmentsAsync(userId, pageNumber, pageSize);
                 return Ok(response);
             }
             catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
@@ -146,15 +148,31 @@ namespace Graduation_project.Controllers
             catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
         }
 
+        //[HttpGet("Doctors")]
+        //[Authorize]
+        //public async Task<IActionResult> GetDoctors()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId)) return Unauthorized();
+        //    try
+        //    {
+        //        var response = await _appointmentService.GetDoctorAsync();
+        //        return Ok(response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { Message = ex.Message });
+        //    }
+        //}
         [HttpGet("Doctors")]
         [Authorize]
-        public async Task<IActionResult> GetDoctors()
+        public async Task<IActionResult> GetDoctors([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
             try
             {
-                var response = await _appointmentService.GetDoctorAsync();
+                var response = await _appointmentService.GetDoctorAsync(pageNumber, pageSize);
                 return Ok(response);
             }
             catch (Exception ex)

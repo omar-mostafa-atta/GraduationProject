@@ -20,10 +20,10 @@ namespace Graduation_project.Controllers
 
         // api/Chat
         [HttpGet]
-        public async Task<IActionResult> GetAllChats()
+        public async Task<IActionResult> GetAllChats([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
         {
             var currentUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var chats = await _chatService.GetAllChatsAsync(currentUserId);
+            var chats = await _chatService.GetAllChatsAsync(currentUserId, pageNumber, pageSize);
             return Ok(chats);
         }
 

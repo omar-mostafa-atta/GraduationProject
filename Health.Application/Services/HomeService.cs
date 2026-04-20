@@ -1,7 +1,9 @@
 ﻿using Health.Application.IServices;
 using Health.Application.Models;
+using Health.Contracts.Common;
 using Health.Contracts.Enums;
 using Health.Contracts.Requests.HomeServiceRequests;
+using Health.Contracts.Requests.Nurses;
 using Health.Contracts.Responses.HomeService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -70,62 +72,84 @@ namespace Health.Application.Services
             };
         }
 
-        public async Task<List<HomeServiceResponse>> GetPatientRequestsAsync(string userId)
+        public async Task<PaginatedResponse<HomeServiceResponse>> GetPatientRequestsAsync(string userId, int pageNumber, int pageSize)
         {
             if (!Guid.TryParse(userId, out var userGuid))
-            {
                 throw new Exception("Invalid User ID format.");
-            }
+
             var patient = await _dbContext.Patients.FirstOrDefaultAsync(p => p.User.Id == userGuid);
             if (patient == null)
-            {
                 throw new Exception("Patient record not found for this user.");
-            }
+
+            var totalCount = await _dbContext.HomeServiceRequests
+                .Where(r => r.PatientId == patient.Id)
+                .CountAsync();
+
             var requests = await _dbContext.HomeServiceRequests
                 .Where(r => r.PatientId == patient.Id)
-                .Include(r => r.Nurse)
-                    .ThenInclude(n => n.User)
+                .Include(r => r.Nurse).ThenInclude(n => n.User)
+                .OrderByDescending(r => r.RequestedTime)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
-            return requests.Select(r => new HomeServiceResponse
+
+            return new PaginatedResponse<HomeServiceResponse>
             {
-                Id = r.Id,
-                ServiceDescription = r.ServiceDescription,
-                RequestedTime = r.RequestedTime,
-                Address = r.Address,
-                Status = r.Status,
-                PatientId = r.PatientId,
-                NurseId = r.NurseId,
-                NurseName = r.NurseId.HasValue ? r.Nurse.User.FirstName : null
-            }).ToList();
+                Data = requests.Select(r => new HomeServiceResponse
+                {
+                    Id = r.Id,
+                    ServiceDescription = r.ServiceDescription,
+                    RequestedTime = r.RequestedTime,
+                    Address = r.Address,
+                    Status = r.Status,
+                    PatientId = r.PatientId,
+                    NurseId = r.NurseId,
+                    NurseName = r.NurseId.HasValue ? r.Nurse.User.FirstName : null
+                }).ToList(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
 
-        public async Task<List<HomeServiceResponse>> GetNurseRequestsAsync(string userId)
+        public async Task<PaginatedResponse<HomeServiceResponse>> GetNurseRequestsAsync(string userId, int pageNumber, int pageSize)
         {
             if (!Guid.TryParse(userId, out var userGuid))
-            {
                 throw new Exception("Invalid User ID format.");
-            }
+
             var nurse = await _dbContext.Nurses.FirstOrDefaultAsync(n => n.User.Id == userGuid);
             if (nurse == null)
-            {
                 throw new Exception("Nurse record not found for this user.");
-            }
+
+            var totalCount = await _dbContext.HomeServiceRequests
+                .Where(r => r.NurseId == nurse.Id)
+                .CountAsync();
+
             var requests = await _dbContext.HomeServiceRequests
                 .Where(r => r.NurseId == nurse.Id)
-                .Include(r => r.Patient)
-                    .ThenInclude(p => p.User)
+                .Include(r => r.Patient).ThenInclude(p => p.User)
+                .OrderByDescending(r => r.RequestedTime)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
-            return requests.Select(r => new HomeServiceResponse
+
+            return new PaginatedResponse<HomeServiceResponse>
             {
-                Id = r.Id,
-                ServiceDescription = r.ServiceDescription,
-                RequestedTime = r.RequestedTime,
-                Address = r.Address,
-                Status = r.Status,
-                PatientId = r.PatientId,
-                NurseId = r.NurseId,
-                PatientName = r.Patient.User.FirstName
-            }).ToList();
+                Data = requests.Select(r => new HomeServiceResponse
+                {
+                    Id = r.Id,
+                    ServiceDescription = r.ServiceDescription,
+                    RequestedTime = r.RequestedTime,
+                    Address = r.Address,
+                    Status = r.Status,
+                    PatientId = r.PatientId,
+                    NurseId = r.NurseId,
+                    PatientName = r.Patient.User.FirstName
+                }).ToList(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
 
         public async Task<HomeServiceResponse> UpdateRequestStatusAsync(string userId, string requestId, bool newStatus)
@@ -244,9 +268,37 @@ namespace Health.Application.Services
 
         }
 
-        public async Task<List<Nurse>> GetNursesAsync()
+        //public async Task<List<Nurse>> GetNursesAsync()
+        //{
+        //    return await _dbContext.Nurses./*Include(n => n.User).*/ToListAsync();
+        //}
+        public async Task<PaginatedResponse<NurseResponse>> GetNursesAsync(int pageNumber, int pageSize)
         {
-            return await _dbContext.Nurses./*Include(n => n.User).*/ToListAsync();
+            var totalCount = await _dbContext.Nurses.CountAsync();
+
+            var nurses = await _dbContext.Nurses
+                .Include(n => n.User)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var data = nurses.Select(n => new NurseResponse
+            {
+                Id = n.Id,
+                FullName = n.User.FirstName + " " + n.User.LastName,
+                Specialization = n.Specialization,
+                ExperienceYears = n.ExperienceYears,
+                ProfilePictureUrl = n.User.ProfilePictureUrl,
+                PhoneNumber = n.PhoneNumber
+            }).ToList();
+
+            return new PaginatedResponse<NurseResponse>
+            {
+                Data = data,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
     }
 }

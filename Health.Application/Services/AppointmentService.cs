@@ -1,7 +1,9 @@
 ﻿using Health.Application.IServices;
 using Health.Application.Models;
+using Health.Contracts.Common;
 using Health.Contracts.Enums;
 using Health.Contracts.Requests.Appointments;
+using Health.Contracts.Responses;
 using Microsoft.EntityFrameworkCore;
 
 namespace Health.Application.Services
@@ -61,7 +63,7 @@ namespace Health.Application.Services
         }
 
         // المريض يشوف مواعيده
-        public async Task<List<AppointmentResponse>> GetPatientAppointmentsAsync(string patientUserId)
+        public async Task<PaginatedResponse<AppointmentResponse>> GetPatientAppointmentsAsync(string patientUserId, int pageNumber, int pageSize)
         {
             if (!Guid.TryParse(patientUserId, out var userGuid))
                 throw new Exception("Invalid User ID.");
@@ -70,18 +72,30 @@ namespace Health.Application.Services
             if (patient == null)
                 throw new Exception("Patient not found.");
 
+            var totalCount = await _dbContext.Appointments
+                .Where(a => a.PatientId == patient.Id)
+                .CountAsync();
+
             var appointments = await _dbContext.Appointments
                 .Include(a => a.Patient).ThenInclude(p => p.User)
                 .Include(a => a.Doctor).ThenInclude(d => d.User)
                 .Where(a => a.PatientId == patient.Id)
                 .OrderByDescending(a => a.AppointmentTime)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return appointments.Select(a => MapToResponse(a, a.Patient, a.Doctor)).ToList();
+            return new PaginatedResponse<AppointmentResponse>
+            {
+                Data = appointments.Select(a => MapToResponse(a, a.Patient, a.Doctor)).ToList(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
 
         // الدكتور يشوف مواعيده
-        public async Task<List<AppointmentResponse>> GetDoctorAppointmentsAsync(string doctorUserId)
+        public async Task<PaginatedResponse<AppointmentResponse>> GetDoctorAppointmentsAsync(string doctorUserId, int pageNumber, int pageSize)
         {
             if (!Guid.TryParse(doctorUserId, out var userGuid))
                 throw new Exception("Invalid User ID.");
@@ -90,14 +104,26 @@ namespace Health.Application.Services
             if (doctor == null)
                 throw new Exception("Doctor not found.");
 
+            var totalCount = await _dbContext.Appointments
+                .Where(a => a.DoctorId == doctor.Id)
+                .CountAsync();
+
             var appointments = await _dbContext.Appointments
                 .Include(a => a.Patient).ThenInclude(p => p.User)
                 .Include(a => a.Doctor).ThenInclude(d => d.User)
                 .Where(a => a.DoctorId == doctor.Id)
                 .OrderByDescending(a => a.AppointmentTime)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return appointments.Select(a => MapToResponse(a, a.Patient, a.Doctor)).ToList();
+            return new PaginatedResponse<AppointmentResponse>
+            {
+                Data = appointments.Select(a => MapToResponse(a, a.Patient, a.Doctor)).ToList(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
 
         // الدكتور يوافق أو يرفض
@@ -290,10 +316,39 @@ namespace Health.Application.Services
             };
         }
 
-        public async Task<List<Doctor>> GetDoctorAsync()
+        //public async Task<List<Doctor>> GetDoctorAsync()
+        //{
+        //    var doctors = await _dbContext.Doctors.ToListAsync();
+        //    return doctors;
+        //}
+        public async Task<PaginatedResponse<DoctorResponse>> GetDoctorAsync(int pageNumber, int pageSize)
         {
-            var doctors = await _dbContext.Doctors.ToListAsync();
-            return doctors;
+            var totalCount = await _dbContext.Doctors.CountAsync();
+
+            var doctors = await _dbContext.Doctors
+                .Include(d => d.User)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var data = doctors.Select(d => new DoctorResponse
+            {
+                Id = d.Id,
+                FullName = d.User.FirstName + " " + d.User.LastName,
+                Specialization = d.Specialization,
+                Bio = d.Bio,
+                ProfilePictureUrl = d.User.ProfilePictureUrl,
+                PhoneNumber = d.PhoneNumber
+            }).ToList();
+
+            return new PaginatedResponse<DoctorResponse>
+            {
+                Data = data,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
     }
+
 }

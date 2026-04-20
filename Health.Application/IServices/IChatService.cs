@@ -1,4 +1,5 @@
 ﻿using Health.Application.Models;
+using Health.Contracts.Common;
 using Health.Contracts.Requests.Chat;
 using Health.Contracts.Responses.Chat;
 using System;
@@ -13,7 +14,7 @@ namespace Health.Application.IServices
     {
         Task<MessageResponse> SendMessageAsync(Guid senderId, SendMessageRequest request);
         Task<List<MessageResponse>> GetChatHistoryAsync(Guid currentUserId, Guid otherUserId);
-        Task<List<ChatResponse>> GetAllChatsAsync(Guid currentUserId);
+        Task<PaginatedResponse<ChatResponse>> GetAllChatsAsync(Guid currentUserId, int pageNumber, int pageSize);
         Task MarkMessagesAsReadAsync(Guid currentUserId, Guid otherUserId);
         Task<Chat> GetOrCreateChatAsync(Guid firstUserId, Guid secondUserId);
     }
