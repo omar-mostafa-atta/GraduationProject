@@ -74,6 +74,7 @@ builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<ICalendlyService, CalendlyService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
 
 builder.Services.AddScoped<IPhotoService, PhotoService>();
