@@ -12,5 +12,7 @@ namespace Health.Application.IServices
         Task<UpdateProfileResponse> UpdatePatientProfileAsync(Guid userId, UpdatePatientProfileRequest request);
 
         Task<User> GetProfileAsync(Guid userId);
+        Task<Nurse> GetNurseDataAsync(Guid userId);
+        Task<Doctor> GetDoctorDataAsync(Guid userId);
     }
 }

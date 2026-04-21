@@ -5,6 +5,7 @@ using Health.Contracts.Enums;
 using Health.Contracts.Requests.HomeServiceRequests;
 using Health.Contracts.Requests.Nurses;
 using Health.Contracts.Responses.HomeService;
+using Health.Contracts.Responses.Patients;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -295,6 +296,48 @@ namespace Health.Application.Services
             return new PaginatedResponse<NurseResponse>
             {
                 Data = data,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
+
+        public async Task<PaginatedResponse<PatientResponse>> GetMyPatientsAsync(string nurseUserId, int pageNumber, int pageSize)
+        {
+            if (!Guid.TryParse(nurseUserId, out var userGuid))
+                throw new Exception("Invalid User ID format.");
+
+            var nurse = await _dbContext.Nurses.FirstOrDefaultAsync(n => n.User.Id == userGuid);
+            if (nurse == null)
+                throw new Exception("Nurse not found.");
+
+            // جيب كل المرضى اللي عندهم (ريكويست كومبليت) مع النيرس دي
+            var patientIds = await _dbContext.HomeServiceRequests
+                .Where(r => r.NurseId == nurse.Id && r.Status == HomeServiceStatus.Completed)
+                .Select(r => r.PatientId)
+                .Distinct()
+                .ToListAsync();
+
+            var totalCount = patientIds.Count;
+
+            var patients = await _dbContext.Patients
+                .Include(p => p.User)
+                .Where(p => patientIds.Contains(p.Id))
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PaginatedResponse<PatientResponse>
+            {
+                Data = patients.Select(p => new PatientResponse
+                {
+                    Id = p.Id,
+                    FullName = p.User.FirstName + " " + p.User.LastName,
+                    ProfilePictureUrl = p.User.ProfilePictureUrl,
+                    Gender = p.Gender,
+                    Address = p.Address,
+                    DateOfBirth = p.DateOfBirth
+                }).ToList(),
                 PageNumber = pageNumber,
                 PageSize = pageSize,
                 TotalCount = totalCount

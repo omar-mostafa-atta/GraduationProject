@@ -1,4 +1,5 @@
-﻿using Health.Application.Models;
+﻿using Health.Contracts.Responses.Patients;
+using Health.Application.Models;
 using Health.Contracts.Common;
 using Health.Contracts.Requests.HomeServiceRequests;
 using Health.Contracts.Requests.Nurses;
@@ -19,5 +20,6 @@ namespace Health.Application.IServices
         Task<HomeServiceResponse> UpdateRequestStatusAsync(string userId, string requestId, bool newStatus);
         Task<HomeServiceResponse> CompleteRequestAsync(string userId, string requestId, bool newStatus);
         Task<PaginatedResponse<NurseResponse>> GetNursesAsync(int pageNumber, int pageSize);
+        Task<PaginatedResponse<PatientResponse>> GetMyPatientsAsync(string nurseUserId, int pageNumber, int pageSize);
     }
 }

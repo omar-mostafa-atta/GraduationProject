@@ -132,5 +132,18 @@ namespace Graduation_project.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+        [HttpGet("MyPatients")]
+        [Authorize(Roles = "Nurse")]
+        public async Task<IActionResult> GetMyPatients([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+            try
+            {
+                var response = await _homeService.GetMyPatientsAsync(userId, pageNumber, pageSize);
+                return Ok(response);
+            }
+            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+        }
     }
 }

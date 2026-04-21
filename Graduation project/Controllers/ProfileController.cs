@@ -60,6 +60,29 @@ namespace Graduation_project.Controllers
             return Ok(patientData);
         }
 
+        [HttpGet("nurseData")]
+        [Authorize(Roles = "Nurse")]
+        public async Task<IActionResult> GetNurseData()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized("User Not Found");
+            var nurseData = await _profileService.GetNurseDataAsync(Guid.Parse(userId));
+            if (nurseData == null) return NotFound("No Data was found for this user in the database");
+            return Ok(nurseData);
+        }
+
+
+        [HttpGet("doctorData")]
+        [Authorize(Roles = "Doctor")]
+        public async Task<IActionResult> GetDoctorData()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized("User Not Found");
+            var doctorData = await _profileService.GetDoctorDataAsync(Guid.Parse(userId));
+            if (doctorData == null) return NotFound("No Data was found for this user in the database");
+            return Ok(doctorData);
+        }
+
         [HttpPut("profile-picture")]
         public async Task<IActionResult> UploadProfilePicture(IFormFile file)
         {

@@ -145,5 +145,20 @@ namespace Health.Application.Services
             var user = await _userManager.FindByIdAsync(userId.ToString());
             return user;
         }
+        public async Task<Nurse> GetNurseDataAsync(Guid userId)
+        {
+            var nurse = await _dbContext.Nurses
+                .Include(n => n.User)
+                .FirstOrDefaultAsync(n => n.Id == userId);
+            return nurse;
+        }
+
+        public async Task<Doctor> GetDoctorDataAsync(Guid userId)
+        {
+            var doctor = await _dbContext.Doctors
+                .Include(d => d.User)
+                .FirstOrDefaultAsync(d => d.Id == userId);
+            return doctor;
+        }
     }
 }
