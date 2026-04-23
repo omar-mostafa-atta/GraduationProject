@@ -31,5 +31,21 @@ namespace Graduation_project.Controllers
                
             return Ok(await response.Content.ReadFromJsonAsync<AiCaloriesResponse>());
         }
+
+        [HttpGet("GetAiDiagnose")]
+        public async Task<IActionResult> GetAiDiagnose(string symptoms)
+        {
+            var url = "https://mennaelzyat-wateen-diseasepredication.hf.space/diagnose";
+            var response = await _httpClient.PostAsJsonAsync(url, new {
+                text = $"{symptoms}" 
+            });
+            if (!response.IsSuccessStatusCode)
+            {
+                return BadRequest(await response.Content.ReadAsStringAsync());
+            }
+       
+               
+            return Ok(await response.Content.ReadFromJsonAsync<AiDiagnoseResponse>());
+        }
     }
 }
