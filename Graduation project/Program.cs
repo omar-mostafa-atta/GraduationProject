@@ -22,7 +22,11 @@ builder.Services
 
 //Dh el Database Configuration
 builder.Services.AddDbContext<WateenDbContext>(options =>
+<<<<<<< Updated upstream
     options.UseSqlServer(builder.Configuration.GetConnectionString("ShrookConnection")));
+=======
+    options.UseSqlServer(builder.Configuration.GetConnectionString("OmarConnection")));
+>>>>>>> Stashed changes
 
 //Dh el Email service configuration
 builder.Services.Configure<EmailSettings>(
