@@ -338,7 +338,9 @@ namespace Health.Application.Services
                 Specialization = d.Specialization,
                 Bio = d.Bio,
                 ProfilePictureUrl = d.User.ProfilePictureUrl,
-                PhoneNumber = d.PhoneNumber
+                PhoneNumber = d.PhoneNumber,
+                ExperienceYears = d.ExperienceYears
+
             }).ToList();
 
             return new PaginatedResponse<DoctorResponse>
