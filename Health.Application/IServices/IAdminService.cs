@@ -11,5 +11,9 @@ namespace Health.Application.IServices
     {
         Task<IEnumerable<PendingDoctorDto>> GetPendingDoctorsAsync();
         Task<IEnumerable<PendingNurseDto>> GetPendingNursesAsync();
+        Task<int> GetUsersCountAsync();
+        Task<int> GetDoctorsCountAsync();
+        Task<int> GetNursesCountAsync();
+        Task<int> GetPatientsCountAsync();
     }
 }

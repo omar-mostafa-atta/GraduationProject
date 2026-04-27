@@ -111,15 +111,7 @@ namespace Graduation_project.Controllers
             return BadRequest(new { Message = "Invalid user ID or token." });
         }
 
-        [HttpDelete("delete-account")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteAccount([FromBody] DeleteUser model)
-        {
-            var response = await _authService.DeleteUserAsync(model);
 
-            return Ok(response);
-
-        }
 
         [HttpPost("change/password")]
         [Authorize]
@@ -134,16 +126,6 @@ namespace Graduation_project.Controllers
             return BadRequest(new { Message = "Current password is incorrect." });
         }
 
-        [HttpPost("accept-reject")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AcceptReject([FromBody] AcceptRejectRequestDto model)
-        {
-            var response = await _authService.AcceptRejectAsync(model.UserId, model.IsAccepted);
-            if (response)
-            {
-                return Ok(new { Message = "User status has been successfully updated." });
-            }
-            return BadRequest(new { Message = "Failed to update user status." });
-        }
+
     }
 }

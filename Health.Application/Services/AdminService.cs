@@ -1,5 +1,6 @@
 ﻿using Health.Application.IServices;
 using Health.Contracts.Responses.Admin;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace Health.Application.Services
             return Task.FromResult<IEnumerable<PendingDoctorDto>>(pendingDoctors);
         }
 
-        public Task<IEnumerable<PendingNurseDto>> GetPendingNursesAsync()
+        public async Task<IEnumerable<PendingNurseDto>> GetPendingNursesAsync()
         {
             var pendingNurses = _dbContext.Nurses.Where(n => n.Status == 0)
                 .Select(n => new PendingNurseDto
@@ -48,11 +49,31 @@ namespace Health.Application.Services
                     ExperienceYears = n.ExperienceYears,
                     Government = n.Government,
                     Status = 0
-                }).ToList();
+                }).ToListAsync();
 
-            return Task.FromResult<IEnumerable<PendingNurseDto>>(pendingNurses);
+            return await Task.FromResult<IEnumerable<PendingNurseDto>>(await pendingNurses);
         }
 
-
+        public async Task<int> GetUsersCountAsync()
+        {
+            var count= await _dbContext.Users.CountAsync();
+            var countWithoutAdmin=count-1;
+            return countWithoutAdmin;
+        }
+        public async Task<int> GetDoctorsCountAsync()
+        {
+            var count = await _dbContext.Doctors.CountAsync();
+            return count;
+        }
+        public async Task<int> GetPatientsCountAsync()
+        {
+            var count = await _dbContext.Patients.CountAsync();
+            return count;
+        }
+        public async Task<int> GetNursesCountAsync()
+        {
+            var count = await _dbContext.Nurses.CountAsync();
+            return count;
+        }
     }
 }
