@@ -1,6 +1,7 @@
 ﻿using Health.Application.IServices;
 using Health.Application.Models;
 using Health.Contracts.Requests.Profile;
+using Health.Contracts.Responses.Profile;
 using Health.Contracts.Responses.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -145,20 +146,47 @@ namespace Health.Application.Services
             var user = await _userManager.FindByIdAsync(userId.ToString());
             return user;
         }
-        public async Task<Nurse> GetNurseDataAsync(Guid userId)
+        public async Task<GetNurseDataResponse> GetNurseDataAsync(Guid userId)
         {
             var nurse = await _dbContext.Nurses
                 .Include(n => n.User)
                 .FirstOrDefaultAsync(n => n.Id == userId);
-            return nurse;
+            if (nurse == null)
+                return null;
+
+            return new GetNurseDataResponse
+            {
+                Id = nurse.Id,
+                LicenseNumber = nurse.LicenseNumber,
+                Specialization = nurse.Specialization,
+                ExperienceYears = nurse.ExperienceYears,
+                PhoneNumber = nurse.PhoneNumber,
+                IsActive = nurse.IsActive,
+                CompletedRequests = nurse.CompletedRequests,
+                Government = nurse.Government
+
+            };
         }
 
-        public async Task<Doctor> GetDoctorDataAsync(Guid userId)
+        public async Task<GetDoctorDataResponse> GetDoctorDataAsync(Guid userId)
         {
             var doctor = await _dbContext.Doctors
                 .Include(d => d.User)
                 .FirstOrDefaultAsync(d => d.Id == userId);
-            return doctor;
+            if (doctor == null)
+                return null;
+
+            return new GetDoctorDataResponse
+            {
+                Id = doctor.Id,
+                Specialization = doctor.Specialization,
+                LicenseNumber = doctor.LicenseNumber,
+                Bio = doctor.Bio,
+                PhoneNumber = doctor.PhoneNumber,
+                AvailabilitySchedule = doctor.AvailabilitySchedule,
+                ExperienceYears = doctor.ExperienceYears,
+                WorkPlace = doctor.WorkPlace
+            };
         }
     }
 }

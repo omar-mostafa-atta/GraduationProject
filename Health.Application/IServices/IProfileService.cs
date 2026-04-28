@@ -1,5 +1,6 @@
 ﻿using Health.Application.Models;
 using Health.Contracts.Requests.Profile;
+using Health.Contracts.Responses.Profile;
 using Health.Contracts.Responses.Users;
 
 namespace Health.Application.IServices
@@ -12,7 +13,7 @@ namespace Health.Application.IServices
         Task<UpdateProfileResponse> UpdatePatientProfileAsync(Guid userId, UpdatePatientProfileRequest request);
 
         Task<User> GetProfileAsync(Guid userId);
-        Task<Nurse> GetNurseDataAsync(Guid userId);
-        Task<Doctor> GetDoctorDataAsync(Guid userId);
+        Task<GetNurseDataResponse> GetNurseDataAsync(Guid userId);
+        Task<GetDoctorDataResponse> GetDoctorDataAsync(Guid userId);
     }
 }
