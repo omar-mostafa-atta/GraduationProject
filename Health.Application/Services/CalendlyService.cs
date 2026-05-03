@@ -260,15 +260,44 @@ namespace Health.Application.Services
             appointment.Status = AppointmentStatus.CancelledPatient;
             await _dbContext.SaveChangesAsync();
         }
+        public async Task ReRegisterWebhookAsync(string doctorUserId)
+        {
+            if (!Guid.TryParse(doctorUserId, out var userGuid))
+                throw new Exception("Invalid User ID.");
 
+            var doctor = await _dbContext.Doctors
+                .Include(d => d.User)
+                .FirstOrDefaultAsync(d => d.User.Id == userGuid)
+                ?? throw new Exception("Doctor not found.");
+
+            var client = GetAuthorizedClient(doctor.CalendlyAccessToken!);
+
+            // Step 1 — delete all old webhook subscriptions for this doctor
+            var existing = await client.GetFromJsonAsync<WebhookListResponse>(
+                $"{_config["Calendly:BaseApiUrl"]}/webhook_subscriptions" +
+                $"?organization={Uri.EscapeDataString(doctor.CalendlyOrganizationUri!)}" +
+                $"&scope=organization");
+
+            if (existing?.Collection != null)
+            {
+                foreach (var webhook in existing.Collection)
+                {
+                    var uuid = webhook.Uri.Split('/').Last();
+                    await client.DeleteAsync(
+                        $"{_config["Calendly:BaseApiUrl"]}/webhook_subscriptions/{uuid}");
+                }
+            }
+
+            // Step 2 — register fresh with current live URL
+            await RegisterWebhookAsync(doctor, doctor.CalendlyAccessToken!);
+        }
         private async Task RegisterWebhookAsync(Doctor doctor, string accessToken)
         {
             var client = GetAuthorizedClient(accessToken);
 
             var payload = new
             {
-                url = _config["Calendly:RedirectUri"]
-                                   .Replace("/callback", "/webhook"),
+                url = _config["Calendly:WebhookUrl"],
                 events = new[] { "invitee.created", "invitee.canceled" },
                 organization = doctor.CalendlyOrganizationUri,
                 user = doctor.CalendlyUri,

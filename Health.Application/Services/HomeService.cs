@@ -273,12 +273,20 @@ namespace Health.Application.Services
         //{
         //    return await _dbContext.Nurses./*Include(n => n.User).*/ToListAsync();
         //}
-        public async Task<PaginatedResponse<NurseResponse>> GetNursesAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResponse<NurseResponse>> GetNursesAsync(int pageNumber, int pageSize, string? government)
         {
-            var totalCount = await _dbContext.Nurses.CountAsync();
-
-            var nurses = await _dbContext.Nurses
+            var query = _dbContext.Nurses
                 .Include(n => n.User)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(government))
+            {
+                query = query.Where(n => n.Government.ToLower() == government.ToLower());
+            }
+
+            var totalCount = await query.CountAsync(); 
+
+            var nurses = await query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

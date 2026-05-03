@@ -118,13 +118,13 @@ namespace Graduation_project.Controllers
         //}
         [HttpGet("Nurses")]
         [Authorize]
-        public async Task<IActionResult> GetNurses([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetNurses([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10,[FromQuery] string? government = null)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
             try
             {
-                var response = await _homeService.GetNursesAsync(pageNumber, pageSize);
+                var response = await _homeService.GetNursesAsync(pageNumber, pageSize, government);
                 return Ok(response);
             }
             catch (Exception ex)

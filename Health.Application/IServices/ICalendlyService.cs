@@ -14,5 +14,6 @@ namespace Health.Application.IServices
         Task<List<AvailableSlot>> GetAvailableSlotsAsync(Guid doctorId, string eventTypeUri, DateTime from, DateTime to);
         Task ProcessWebhookAsync(string body, string signature);
         string GetAuthorizationUrl(string doctorUserId);
+        Task ReRegisterWebhookAsync(string doctorUserId);
     }
 }

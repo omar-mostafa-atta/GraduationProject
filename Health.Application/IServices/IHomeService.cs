@@ -19,7 +19,7 @@ namespace Health.Application.IServices
         Task<PaginatedResponse<HomeServiceResponse>> GetNurseRequestsAsync(string userId, int pageNumber, int pageSize);
         Task<HomeServiceResponse> UpdateRequestStatusAsync(string userId, string requestId, bool newStatus);
         Task<HomeServiceResponse> CompleteRequestAsync(string userId, string requestId, bool newStatus);
-        Task<PaginatedResponse<NurseResponse>> GetNursesAsync(int pageNumber, int pageSize);
+        Task<PaginatedResponse<NurseResponse>> GetNursesAsync(int pageNumber, int pageSize, string? government );
         Task<PaginatedResponse<PatientResponse>> GetMyPatientsAsync(string nurseUserId, int pageNumber, int pageSize);
     }
 }

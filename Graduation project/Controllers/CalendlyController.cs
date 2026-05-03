@@ -134,5 +134,23 @@ namespace Graduation_project.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+
+        [HttpPost("reregister-webhook")]
+        [Authorize(Roles = "Doctor")]
+        public async Task<IActionResult> ReRegisterWebhook()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            try
+            {
+                await _calendlyService.ReRegisterWebhookAsync(userId);
+                return Ok(new { Message = "Webhook re-registered successfully with live URL." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
     }
 }
