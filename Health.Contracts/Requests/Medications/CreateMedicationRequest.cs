@@ -1,12 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Health.Contracts.Requests.Medications
 {
-    internal class CreateMedicationRequest
+    public class CreateMedicationRequest
     {
+        [Required]
+        public Guid PatientId { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        [Required]
+        public string Dosage { get; set; }
+
+        [Required]
+        public string Frequency { get; set; }
+
+        [Required]
+        public string Duration { get; set; }
+
+        [Required]
+        public string Instructions { get; set; }
+
+        [Required]
+        public DateTime StartDate { get; set; }
+
+        public DateTime? EndDate { get; set; }
     }
 }

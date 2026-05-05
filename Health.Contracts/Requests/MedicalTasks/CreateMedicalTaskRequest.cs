@@ -1,12 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Health.Contracts.Requests.MedicalTasks
 {
-    internal class CreateMedicalTaskRequest
+    public class CreateMedicalTaskRequest
     {
+        [Required]
+        public Guid PatientId { get; set; }
+
+        [Required]
+        public string TaskTitle { get; set; }
+
+        [Required]
+        public string TaskDescription { get; set; }
+
+        [Required]
+        public DateTime DueDate { get; set; }
+
+        [Required]
+        [RegularExpression("^(High|Medium|Low)$")]
+        public string Priority { get; set; }
+
+        [Required]
+        [RegularExpression("^(Test|Appointment|Medication|Other)$")]
+        public string Category { get; set; }
     }
 }

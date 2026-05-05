@@ -22,7 +22,7 @@ builder.Services
 
 //Dh el Database Configuration
 builder.Services.AddDbContext<WateenDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MonsterAsp")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ShrookConnection")));
 
 //Dh el Email service configuration
 builder.Services.Configure<EmailSettings>(
@@ -76,10 +76,11 @@ builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<ICalendlyService, CalendlyService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
-
+builder.Services.AddScoped<IMedicalTaskService, MedicalTaskService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
+builder.Services.AddScoped<IMedicationService, MedicationService>();
 
 builder.Services.AddControllers();
 

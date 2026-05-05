@@ -1,12 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Health.Contracts.Requests.Medications
+﻿namespace Health.Contracts.Requests.Medications
 {
-    internal class MedicationResponse
+    public class MedicationResponse
     {
+        public Guid Id { get; set; }
+        public Guid PatientId { get; set; }
+        public Guid? DoctorId { get; set; }
+        public string DoctorName { get; set; }
+        public string Name { get; set; }
+        public string Dosage { get; set; }
+        public string Frequency { get; set; }
+        public string Duration { get; set; }
+        public string Instructions { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Health.Application.Models
 {
@@ -18,10 +13,14 @@ namespace Health.Application.Models
         public Guid PatientId { get; set; }
         public Patient Patient { get; set; }
 
+        public string TaskTitle { get; set; }
         public string TaskDescription { get; set; }
-       // public string Frequency { get; set; }
+        public DateTime DueDate { get; set; }
+        public string Priority { get; set; }    // High / Medium / Low
+        public string Category { get; set; }    // Test / Appointment / Medication / Other
+        public bool IsCompleted { get; set; } = false;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<Medication> Medications { get; set; }
     }
-
 }

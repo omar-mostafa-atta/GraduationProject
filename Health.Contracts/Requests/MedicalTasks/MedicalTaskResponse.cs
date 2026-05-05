@@ -1,12 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Health.Contracts.Requests.MedicalTasks
+﻿namespace Health.Contracts.Requests.MedicalTasks
 {
-    internal class MedicalTaskResponse
+    public class MedicalTaskResponse
     {
+        public Guid Id { get; set; }
+        public Guid PatientId { get; set; }
+        public Guid? DoctorId { get; set; }
+        public string DoctorName { get; set; }
+        public string TaskTitle { get; set; }
+        public string TaskDescription { get; set; }
+        public DateTime DueDate { get; set; }
+        public string Priority { get; set; }
+        public string Category { get; set; }
+        public bool IsCompleted { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }
