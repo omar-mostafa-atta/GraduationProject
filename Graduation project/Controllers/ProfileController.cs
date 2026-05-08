@@ -50,11 +50,15 @@ namespace Graduation_project.Controllers
         }
 
         [HttpGet("patientData")]
-        [Authorize(Roles = "Patient")]
-        public async Task<IActionResult> GetPatientData()
+        [Authorize(Roles = "Patient,Admin,Doctor,Nurse")]
+        public async Task<IActionResult> GetPatientData(string? userId=null)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null) return Unauthorized("User Not Found");
+            if (string.IsNullOrEmpty(userId))
+            {
+                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null) return Unauthorized("User Not Found");
+            }
+            
             var patientData = await _profileService.GetPatientDataAsync(Guid.Parse(userId));
             if (patientData == null) return NotFound("No Data was found for this user in the database");
             return Ok(patientData);

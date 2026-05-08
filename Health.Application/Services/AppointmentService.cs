@@ -4,6 +4,7 @@ using Health.Contracts.Common;
 using Health.Contracts.Enums;
 using Health.Contracts.Requests.Appointments;
 using Health.Contracts.Responses;
+using Health.Contracts.Responses.Patients;
 using Microsoft.EntityFrameworkCore;
 
 namespace Health.Application.Services
@@ -350,6 +351,133 @@ namespace Health.Application.Services
                 PageSize = pageSize,
                 TotalCount = totalCount
             };
+        }
+
+
+
+       public async Task<PaginatedResponse<AppointmentResponse>> GetTodaysAppointmentForDoctorAsync(string doctorUserId, int pageNumber, int pageSize) 
+        {
+
+            if (!Guid.TryParse(doctorUserId, out var userGuid))
+                throw new Exception("Invalid User ID.");
+
+            var doctor = await _dbContext.Doctors.FirstOrDefaultAsync(d => d.User.Id == userGuid);
+            if (doctor == null)
+                throw new Exception("Doctor not found.");
+
+
+            var today = DateTime.UtcNow.Date;
+            var tomorrow = today.AddDays(1);
+
+            var totalCount = await _dbContext.Appointments
+                .Where(a => a.DoctorId == doctor.Id &&
+                                          a.AppointmentTime >= today &&
+                                          a.AppointmentTime < tomorrow
+                                         ).CountAsync();
+
+
+            var appointment = await _dbContext.Appointments
+                .Include(a => a.Patient).ThenInclude(p => p.User)
+                .Include(a => a.Doctor).ThenInclude(d => d.User)
+                .Where(a => a.DoctorId == doctor.Id &&
+                                          a.AppointmentTime >= today &&
+                                          a.AppointmentTime < tomorrow 
+                                         )
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            return new PaginatedResponse<AppointmentResponse>
+            {
+                Data = appointment.Select(a => MapToResponse(a, a.Patient, a.Doctor)).ToList(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
+
+
+
+        public async Task<PaginatedResponse<AppointmentResponse>> GetUpcomingAppointmentsForDoctorAsync(string doctorUserId, int pageNumber, int pageSize)
+        {
+            if (!Guid.TryParse(doctorUserId, out var userGuid))
+                throw new Exception("Invalid User ID.");
+
+            var doctor = await _dbContext.Doctors.FirstOrDefaultAsync(d => d.User.Id == userGuid);
+            if (doctor == null)
+                throw new Exception("Doctor not found.");
+
+
+            var today = DateTime.UtcNow.Date;
+            var tomorrow = DateTime.UtcNow.Date.AddDays(1);
+
+
+            var totalCount = await _dbContext.Appointments
+                .Where(a => a.DoctorId == doctor.Id &&
+                                        a.AppointmentTime >= tomorrow
+                                         ).CountAsync();
+
+
+            var appointment = await _dbContext.Appointments
+                .Include(a => a.Patient).ThenInclude(p => p.User)
+                .Include(a => a.Doctor).ThenInclude(d => d.User)
+                .Where(a => a.DoctorId == doctor.Id &&
+                                          a.AppointmentTime >=tomorrow
+                                         )
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            return new PaginatedResponse<AppointmentResponse>
+            {
+                Data = appointment.Select(a => MapToResponse(a, a.Patient, a.Doctor)).ToList(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+
+
+
+        }
+
+
+
+        public async Task<PaginatedResponse<PatientForDoctorDto>> GetPatientsForDoctorAsync(string doctorUserId, int pageNumber, int pageSize)
+        {
+            if (!Guid.TryParse(doctorUserId, out var userGuid))
+                throw new Exception("Invalid User ID.");
+            var doctor = await _dbContext.Doctors.FirstOrDefaultAsync(d => d.User.Id == userGuid);
+            if (doctor == null)
+                throw new Exception("Doctor not found.");
+            var totalCount = await _dbContext.Appointments
+                .Where(a => a.DoctorId == doctor.Id)
+                .Select(a => a.PatientId)
+                .Distinct()
+                .CountAsync();
+            var patients = await _dbContext.Patients
+                 .Include(p => p.User)
+                 .Where(p => _dbContext.Appointments
+                     .Where(a => a.DoctorId == doctor.Id)
+                     .Select(a => a.PatientId)
+                     .Contains(p.Id))
+                 .Skip((pageNumber - 1) * pageSize)
+                 .Take(pageSize)
+                 .Select(p => new PatientForDoctorDto
+                 {
+                     Id = p.Id,
+                     FirstName = p.User.FirstName,
+                     LastName = p.User.LastName,
+                     Email = p.User.Email,
+                     Gender = p.Gender,
+                     PhoneNumber = p.PhoneNumber
+                 })
+                 .ToListAsync();
+            return new PaginatedResponse<PatientForDoctorDto>
+            {
+                Data = patients,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+
         }
     }
 

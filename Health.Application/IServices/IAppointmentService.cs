@@ -2,6 +2,7 @@
 using Health.Contracts.Common;
 using Health.Contracts.Requests.Appointments;
 using Health.Contracts.Responses;
+using Health.Contracts.Responses.Patients;
 
 namespace Health.Application.IServices
 {
@@ -16,5 +17,10 @@ namespace Health.Application.IServices
         Task<AppointmentResponse> RescheduleByPatientAsync(string patientUserId, Guid appointmentId, RescheduleAppointmentRequest request);
         Task<AppointmentResponse> CompleteAppointmentAsync(string doctorUserId, Guid appointmentId);
         Task<PaginatedResponse<DoctorResponse>> GetDoctorAsync(int pageNumber, int pageSize);
+
+        Task<PaginatedResponse<AppointmentResponse>> GetTodaysAppointmentForDoctorAsync(string doctorUserId, int pageNumber, int pageSize);
+        Task<PaginatedResponse<AppointmentResponse>> GetUpcomingAppointmentsForDoctorAsync(string doctorUserId, int pageNumber, int pageSize);
+
+        Task<PaginatedResponse<PatientForDoctorDto>> GetPatientsForDoctorAsync(string doctorUserId, int pageNumber, int pageSize);
     }
 }
