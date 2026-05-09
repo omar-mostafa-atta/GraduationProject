@@ -17,6 +17,7 @@ public class WateenDbContext : IdentityDbContext<User, ApplicationRole, Guid>
     public DbSet<Chat> Chats { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<MedicalRecord> MedicalRecords { get; set; }
+    public DbSet<RecordedVital> RecordedVitals { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
