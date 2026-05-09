@@ -3,8 +3,10 @@ using Health.Application.Models;
 using Health.Contracts.Common;
 using Health.Contracts.Enums;
 using Health.Contracts.Requests.Appointments;
+using Health.Contracts.Requests.MedicalRecords;
 using Health.Contracts.Responses;
 using Health.Contracts.Responses.Patients;
+using Health.Contracts.Responses.Vitals;
 using Microsoft.EntityFrameworkCore;
 
 namespace Health.Application.Services
@@ -510,6 +512,106 @@ namespace Health.Application.Services
                 TotalCount = totalCount
             };
 
+        }
+        public async Task<PatientDetailsResponse> GetPatientDetailsAsync(string doctorUserId, Guid patientId)
+        {
+            if (!Guid.TryParse(doctorUserId, out var userGuid))
+                throw new Exception("Invalid User ID.");
+
+            var doctor = await _dbContext.Doctors.FirstOrDefaultAsync(d => d.User.Id == userGuid);
+            if (doctor == null)
+                throw new Exception("Doctor not found.");
+
+            var patient = await _dbContext.Patients
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.Id == patientId);
+            if (patient == null)
+                throw new Exception("Patient not found.");
+
+            // العمر
+            var age = patient.DateOfBirth.HasValue
+                ? DateTime.UtcNow.Year - patient.DateOfBirth.Value.Year
+                : (int?)null;
+
+            // آخر Vitals
+            var lastVital = await _dbContext.RecordedVitals
+                .Where(v => v.PatientId == patientId)
+                .OrderByDescending(v => v.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            // Blood Pressure Trend — آخر 7 قراءات
+            var trend = await _dbContext.RecordedVitals
+                .Include(v => v.CreatedBy)
+                .Where(v => v.PatientId == patientId && v.BloodPressure != null)
+                .OrderByDescending(v => v.CreatedAt)
+                .Take(7)
+                .ToListAsync();
+
+            // Medical History
+            var medicalHistory = await _dbContext.MedicalRecords
+                .Include(r => r.Doctor).ThenInclude(d => d.User)
+                .Where(r => r.PatientId == patientId && r.RecordType == "Medical History")
+                .OrderByDescending(r => r.RecordDate)
+                .ToListAsync();
+
+            // Medication Adherence
+            var totalMeds = await _dbContext.Medications
+                .Where(m => m.PatientId == patientId)
+                .CountAsync();
+
+            var activeMeds = await _dbContext.Medications
+                .Where(m => m.PatientId == patientId && m.IsActive)
+                .CountAsync();
+
+            var adherencePercent = totalMeds > 0
+                ? Math.Round((double)activeMeds / totalMeds * 100, 1)
+                : 0;
+
+            return new PatientDetailsResponse
+            {
+                Id = patient.Id,
+                FullName = patient.User.FirstName + " " + patient.User.LastName,
+                ProfilePictureUrl = patient.User.ProfilePictureUrl,
+                Gender = patient.Gender,
+                Age = age,
+                Address = patient.Address,
+                PhoneNumber = patient.PhoneNumber,
+
+                LastBloodPressure = lastVital?.BloodPressure,
+                LastBloodSugar = lastVital?.BloodSugarLevel,
+                LastHeartRate = lastVital?.HeartRate,
+                LastOxygenLevel = lastVital?.OxygenLevel,
+
+                BloodPressureTrend = trend.Select(v => new VitalResponse
+                {
+                    Id = v.Id,
+                    PatientId = v.PatientId,
+                    BloodPressure = v.BloodPressure,
+                    BloodSugarLevel = v.BloodSugarLevel,
+                    HeartRate = v.HeartRate,
+                    OxygenLevel = v.OxygenLevel,
+                    RecordedBy = v.CreatedBy.FirstName + " " + v.CreatedBy.LastName,
+                    CreatedAt = v.CreatedAt
+                }).ToList(),
+
+                MedicalHistory = medicalHistory.Select(r => new MedicalRecordResponse
+                {
+                    Id = r.Id,
+                    PatientId = r.PatientId,
+                    DoctorId = r.DoctorId,
+                    DoctorName = r.Doctor != null ? r.Doctor.User.FirstName + " " + r.Doctor.User.LastName : null,
+                    RecordType = r.RecordType,
+                    Title = r.Title,
+                    Description = r.Description,
+                    FileUrl = r.FileUrl,
+                    RecordDate = r.RecordDate,
+                    CreatedAt = r.CreatedAt
+                }).ToList(),
+
+                TotalMedications = totalMeds,
+                ActiveMedications = activeMeds,
+                MedicationAdherencePercent = adherencePercent
+            };
         }
     }
 

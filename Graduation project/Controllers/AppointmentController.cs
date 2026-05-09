@@ -247,5 +247,20 @@ namespace Graduation_project.Controllers
             catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
         }
 
+        // GET: api/Appointment/patient-details/{patientId}
+        [HttpGet("patient-details/{patientId}")]
+        [Authorize(Roles = "Doctor")]
+        public async Task<IActionResult> GetPatientDetails(Guid patientId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+            try
+            {
+                var response = await _appointmentService.GetPatientDetailsAsync(userId, patientId);
+                return Ok(response);
+            }
+            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+        }
+
     }
 }
