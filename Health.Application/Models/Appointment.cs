@@ -28,6 +28,7 @@ namespace Health.Application.Models
         public string? CalendlyEventUri { get; set; }  // tracks which Calendly event this is
         public string? CalendlyJoinUrl { get; set; }  // video link from Calendly
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string? PatientProblem { get; set; }
     }
 
 }

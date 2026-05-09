@@ -17,5 +17,10 @@ namespace Health.Contracts.Requests.Appointments
         public string? VideoCallLink { get; set; }
         public string? RescheduleReason { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? PatientGender { get; set; }
+        public int? PatientAge { get; set; }
+        public string? PatientProblem { get; set; }
+        public string? DoctorLocation { get; set; }
+        public string? DoctorProfilePicture { get; set; }
     }
 }

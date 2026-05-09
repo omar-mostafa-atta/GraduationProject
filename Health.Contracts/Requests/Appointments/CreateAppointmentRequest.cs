@@ -15,5 +15,6 @@ namespace Health.Contracts.Requests.Appointments
         public string Type { get; set; }
 
         public string? Notes { get; set; }
+        public string? PatientProblem { get; set; }
     }
 }

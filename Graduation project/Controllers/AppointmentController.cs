@@ -232,6 +232,20 @@ namespace Graduation_project.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+        // GET: api/Appointment/{appointmentId}
+        [HttpGet("{appointmentId}")]
+        [Authorize(Roles = "Patient,Doctor")]
+        public async Task<IActionResult> GetAppointmentById(Guid appointmentId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+            try
+            {
+                var response = await _appointmentService.GetAppointmentByIdAsync(userId, appointmentId);
+                return Ok(response);
+            }
+            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+        }
 
     }
 }

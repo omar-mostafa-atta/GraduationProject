@@ -22,5 +22,6 @@ namespace Health.Application.IServices
         Task<PaginatedResponse<AppointmentResponse>> GetUpcomingAppointmentsForDoctorAsync(string doctorUserId, int pageNumber, int pageSize);
 
         Task<PaginatedResponse<PatientForDoctorDto>> GetPatientsForDoctorAsync(string doctorUserId, int pageNumber, int pageSize);
+        Task<AppointmentResponse> GetAppointmentByIdAsync(string userId, Guid appointmentId);
     }
 }

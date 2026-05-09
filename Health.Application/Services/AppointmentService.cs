@@ -54,6 +54,7 @@ namespace Health.Application.Services
                 Type = request.Type,
                 Status = AppointmentStatus.Pending,
                 Notes = request.Notes,
+                PatientProblem = request.PatientProblem,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -299,14 +300,23 @@ namespace Health.Application.Services
         // Helper
         private AppointmentResponse MapToResponse(Appointment a, Patient patient, Doctor doctor)
         {
+            var age = patient.DateOfBirth.HasValue
+        ? DateTime.UtcNow.Year - patient.DateOfBirth.Value.Year
+        : (int?)null;
+
             return new AppointmentResponse
             {
                 Id = a.Id,
                 PatientId = a.PatientId,
                 PatientName = patient.User.FirstName + " " + patient.User.LastName,
+                PatientGender = patient.Gender,
+                PatientAge = age,
+                PatientProblem = a.PatientProblem,
                 DoctorId = a.DoctorId,
                 DoctorName = doctor.User.FirstName + " " + doctor.User.LastName,
                 DoctorSpecialization = doctor.Specialization,
+                DoctorLocation = doctor.Location,
+                DoctorProfilePicture = doctor.User.ProfilePictureUrl,
                 AppointmentTime = a.AppointmentTime,
                 Type = a.Type,
                 Status = a.Status,
@@ -315,6 +325,28 @@ namespace Health.Application.Services
                 RescheduleReason = a.RescheduleReason,
                 CreatedAt = a.CreatedAt
             };
+        }
+        public async Task<AppointmentResponse> GetAppointmentByIdAsync(string userId, Guid appointmentId)
+        {
+            if (!Guid.TryParse(userId, out var userGuid))
+                throw new Exception("Invalid User ID.");
+
+            var appointment = await _dbContext.Appointments
+                .Include(a => a.Patient).ThenInclude(p => p.User)
+                .Include(a => a.Doctor).ThenInclude(d => d.User)
+                .FirstOrDefaultAsync(a => a.Id == appointmentId);
+
+            if (appointment == null)
+                throw new Exception("Appointment not found.");
+
+            // تأكد إن اليوزر ده صاحب الميعاد ده
+            var isPatient = appointment.Patient.User.Id == userGuid;
+            var isDoctor = appointment.Doctor.User.Id == userGuid;
+
+            if (!isPatient && !isDoctor)
+                throw new Exception("Not authorized.");
+
+            return MapToResponse(appointment, appointment.Patient, appointment.Doctor);
         }
 
         //public async Task<List<Doctor>> GetDoctorAsync()
