@@ -1,24 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Health.Application.Models
+﻿namespace Health.Contracts.Requests.MedicalRecords
 {
-    public class MedicalRecord
+    public class MedicalRecordResponse
     {
-        [Key]
         public Guid Id { get; set; }
-
         public Guid PatientId { get; set; }
-        public Patient Patient { get; set; }
-
         public Guid? DoctorId { get; set; }
-        public Doctor Doctor { get; set; }
-
-        // Lab Result | Doctor Note | Medical History | Imaging
+        public string? DoctorName { get; set; }
         public string RecordType { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string? FileUrl { get; set; }
         public DateTime RecordDate { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
     }
 }

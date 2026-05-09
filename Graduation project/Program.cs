@@ -81,6 +81,7 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<IMedicationService, MedicationService>();
+builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 
 builder.Services.AddControllers();
 
