@@ -97,5 +97,38 @@ namespace Graduation_project.Controllers
             }
             catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
         }
+        // POST: api/MedicalRecord/upload-file
+        [HttpPost("upload-file")]
+        [Authorize]
+        public async Task<IActionResult> UploadFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { Message = "No file uploaded." });
+            // تحويل الفايل لـ base64
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            var base64 = Convert.ToBase64String(stream.ToArray());
+            var fileType = file.ContentType; // image/jpeg or application/pdf
+                                             // بعت على Cloudinary
+            using var httpClient = new HttpClient();
+            var cloudName = "dushdtpdb";
+            var uploadPreset = "sykdvle5";
+            var formData = new MultipartFormDataContent
+    {
+        { new StringContent($"data:{fileType};base64,{base64}"), "file" },
+        { new StringContent(uploadPreset), "upload_preset" }
+    };
+            var response = await httpClient.PostAsync(
+                $"https://api.cloudinary.com/v1_1/{cloudName}/auto/upload",
+                formData
+            );
+            if (!response.IsSuccessStatusCode)
+                return BadRequest(new { Message = "File upload failed." });
+            var result = await response.Content.ReadAsStringAsync();
+            var json = System.Text.Json.JsonDocument.Parse(result);
+            var fileUrl = json.RootElement.GetProperty("secure_url").GetString();
+            return Ok(new { FileUrl = fileUrl });
+        }
+
     }
 }

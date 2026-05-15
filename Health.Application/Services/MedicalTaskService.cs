@@ -177,5 +177,45 @@ namespace Health.Application.Services
                 CreatedAt = t.CreatedAt
             };
         }
+        public async Task<MedicalTaskResponse> UpdateTaskAsync(string doctorUserId, Guid taskId, UpdateMedicalTaskRequest request)
+        {
+            if (!Guid.TryParse(doctorUserId, out var userGuid))
+                throw new Exception("Invalid User ID.");
+
+            var doctor = await _dbContext.Doctors
+                .Include(d => d.User)
+                .FirstOrDefaultAsync(d => d.User.Id == userGuid);
+            if (doctor == null)
+                throw new Exception("Doctor not found.");
+
+            var task = await _dbContext.MedicalTasks
+                .Include(t => t.Doctor).ThenInclude(d => d.User)
+                .FirstOrDefaultAsync(t => t.Id == taskId);
+
+            if (task == null)
+                throw new Exception("Task not found.");
+
+            if (task.DoctorId != doctor.Id)
+                throw new Exception("Not authorized.");
+
+            if (!string.IsNullOrWhiteSpace(request.TaskTitle))
+                task.TaskTitle = request.TaskTitle;
+
+            if (!string.IsNullOrWhiteSpace(request.TaskDescription))
+                task.TaskDescription = request.TaskDescription;
+
+            if (request.DueDate.HasValue)
+                task.DueDate = request.DueDate.Value;
+
+            if (!string.IsNullOrWhiteSpace(request.Priority))
+                task.Priority = request.Priority;
+
+            if (!string.IsNullOrWhiteSpace(request.Category))
+                task.Category = request.Category;
+
+            await _dbContext.SaveChangesAsync();
+
+            return MapToResponse(task, doctor.User.FirstName + " " + doctor.User.LastName);
+        }
     }
 }

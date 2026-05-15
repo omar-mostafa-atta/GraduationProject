@@ -97,5 +97,19 @@ namespace Graduation_project.Controllers
             }
             catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
         }
+        // PUT: api/MedicalTask/update/{taskId}
+        [HttpPut("update/{taskId}")]
+        [Authorize(Roles = "Doctor")]
+        public async Task<IActionResult> UpdateTask(Guid taskId, [FromBody] UpdateMedicalTaskRequest request)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+            try
+            {
+                var response = await _medicalTaskService.UpdateTaskAsync(userId, taskId, request);
+                return Ok(response);
+            }
+            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+        }
     }
 }

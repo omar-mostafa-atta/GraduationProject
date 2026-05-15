@@ -19,5 +19,6 @@ namespace Health.Application.IServices
 
         // الدكتور يحذف Task
         Task<bool> DeleteTaskAsync(string doctorUserId, Guid taskId);
+        Task<MedicalTaskResponse> UpdateTaskAsync(string doctorUserId, Guid taskId, UpdateMedicalTaskRequest request);
     }
 }
