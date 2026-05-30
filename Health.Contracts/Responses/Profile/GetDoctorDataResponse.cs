@@ -16,7 +16,8 @@ namespace Health.Contracts.Responses.Profile
         public string PhoneNumber { get; set; }
         public string? AvailabilitySchedule { get; set; }
         public int ExperienceYears { get; set; }
-
+        public string? Education { get; set; }
+        public string? Certifications { get; set; }
         public string? WorkPlace { get; set; }
     }
 }

@@ -60,6 +60,8 @@ namespace Health.Application.Services
                     if (!string.IsNullOrWhiteSpace(request.LastName)) doctor.LastName = request.LastName;
                     if (!string.IsNullOrWhiteSpace(request.Email)) doctor.Email = request.Email;
                     if (!string.IsNullOrWhiteSpace(request.ProfilePictureUrl)) doctor.ProfilePictureUrl = request.ProfilePictureUrl;
+                    if (!string.IsNullOrWhiteSpace(request.Education)) doctor.Education = request.Education;
+                    if (!string.IsNullOrWhiteSpace(request.Certifications)) doctor.Certification = request.Certifications;
                 }
             }
             else if (roles.Contains("Nurse"))
@@ -71,6 +73,8 @@ namespace Health.Application.Services
                     if (!string.IsNullOrWhiteSpace(request.LastName)) nurse.LastName = request.LastName;
                     if (!string.IsNullOrWhiteSpace(request.Email)) nurse.Email = request.Email;
                     if (!string.IsNullOrWhiteSpace(request.ProfilePictureUrl)) nurse.ProfilePictureUrl = request.ProfilePictureUrl;
+                    if (!string.IsNullOrWhiteSpace(request.Education)) nurse.Education = request.Education;
+                    if (!string.IsNullOrWhiteSpace(request.Certifications)) nurse.Certification = request.Certifications;
                 }
             }
 
@@ -83,7 +87,11 @@ namespace Health.Application.Services
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                ProfilePictureUrl = user.ProfilePictureUrl
+                ProfilePictureUrl = user.ProfilePictureUrl,
+                Education = roles.Contains("Doctor") ? (await _dbContext.Doctors.Where(d => d.Id == userId).Select(d => d.Education).FirstOrDefaultAsync()) :
+                            roles.Contains("Nurse") ? (await _dbContext.Nurses.Where(n => n.Id == userId).Select(n => n.Education).FirstOrDefaultAsync()) : null,
+                Certifications = roles.Contains("Doctor") ? (await _dbContext.Doctors.Where(d => d.Id == userId).Select(d => d.Certification).FirstOrDefaultAsync()) :
+                            roles.Contains("Nurse") ? (await _dbContext.Nurses.Where(n => n.Id == userId).Select(n => n.Certification).FirstOrDefaultAsync()) : null,
             };
         }
 
@@ -163,7 +171,9 @@ namespace Health.Application.Services
                 PhoneNumber = nurse.PhoneNumber,
                 IsActive = nurse.IsActive,
                 CompletedRequests = nurse.CompletedRequests,
-                Government = nurse.Government
+                Government = nurse.Government,
+                Education = nurse.Education,
+                Certifications = nurse.Certification
 
             };
         }
@@ -185,7 +195,9 @@ namespace Health.Application.Services
                 PhoneNumber = doctor.PhoneNumber,
                 AvailabilitySchedule = doctor.AvailabilitySchedule,
                 ExperienceYears = doctor.ExperienceYears,
-                WorkPlace = doctor.WorkPlace
+                WorkPlace = doctor.WorkPlace,
+                Education = doctor.Education,
+                Certifications = doctor.Certification
             };
         }
     }

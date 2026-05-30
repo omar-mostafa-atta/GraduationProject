@@ -65,7 +65,7 @@ namespace Graduation_project.Controllers
         }
 
         [HttpGet("nurseData")]
-        [Authorize(Roles = "Nurse")]
+        [Authorize(Roles = "Nurse,Patient")]
         public async Task<IActionResult> GetNurseData()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -77,7 +77,7 @@ namespace Graduation_project.Controllers
 
 
         [HttpGet("doctorData")]
-        [Authorize(Roles = "Doctor")]
+        [Authorize(Roles = "Doctor,Patient")]
         public async Task<IActionResult> GetDoctorData()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

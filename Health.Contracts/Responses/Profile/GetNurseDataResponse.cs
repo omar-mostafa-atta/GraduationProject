@@ -18,6 +18,8 @@ namespace Health.Contracts.Responses.Profile
         public int CompletedRequests { get; set; }
 
         public string? Government { get; set; }
+        public string? Education { get; set; }
+        public string? Certifications { get; set; }
     }
 
     
