@@ -12,6 +12,7 @@ namespace Health.Contracts.Responses.HomeService
         public Guid Id { get; set; }
         public string ServiceDescription { get; set; }
         public DateTime RequestedTime { get; set; }
+        public string Government  { get; set; }
         public string Address { get; set; }
         public HomeServiceStatus Status { get; set; }
         public Guid PatientId { get; set; }

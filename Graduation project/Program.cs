@@ -1,3 +1,4 @@
+using Graduation_project.BackgroundServices;
 using Graduation_project.Hubs;
 using Health.Application;
 using Health.Application.IServices;
@@ -22,7 +23,7 @@ builder.Services
 
 //Dh el Database Configuration
 builder.Services.AddDbContext<WateenDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MonsterAsp")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("OmarConnection")));
 
 //Dh el Email service configuration
 builder.Services.Configure<EmailSettings>(
@@ -83,6 +84,8 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<IMedicationService, MedicationService>();
 builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 builder.Services.AddScoped<IVitalService, VitalService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddHostedService<MedicationReminderService>();
 
 builder.Services.AddControllers();
 
@@ -136,6 +139,7 @@ var app = builder.Build();
 
 app.UseCors("AllowAll");
 app.MapHub<ChatHub>("/hubs/chat");
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 using (var scope = app.Services.CreateScope())
 {

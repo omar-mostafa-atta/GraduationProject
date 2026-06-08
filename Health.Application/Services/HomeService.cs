@@ -49,6 +49,7 @@ namespace Health.Application.Services
                 ServiceDescription = request.ServiceDescription,
                 RequestedTime = request.RequestedTime,
                 Address = request.Address,
+                Government = request.Government,
                 NurseId = request.NurseId,
                 Status = HomeServiceStatus.Pending
             };
@@ -143,6 +144,7 @@ namespace Health.Application.Services
                     RequestedTime = r.RequestedTime,
                     Address = r.Address,
                     Status = r.Status,
+                    Government = r.Government,
                     PatientId = r.PatientId,
                     NurseId = r.NurseId,
                     PatientName = r.Patient.User.FirstName

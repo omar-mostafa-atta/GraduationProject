@@ -24,6 +24,7 @@ namespace Health.Application.Models
         public DateTime RequestedTime { get; set; }
         public string Address { get; set; }
         public HomeServiceStatus Status { get; set; }// momkn tkon pending | accepted | completed | Rejected (ظبطها) 
+        public string Government { get; set; }
     }
 
 }

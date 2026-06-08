@@ -290,8 +290,6 @@ namespace Health.Application.Services
             if (appointment.DoctorId != doctor.Id)
                 throw new Exception("Not authorized.");
 
-            if (appointment.Status != AppointmentStatus.Confirmed)
-                throw new Exception("Appointment must be confirmed before completing.");
 
             appointment.Status = AppointmentStatus.Completed;
             await _dbContext.SaveChangesAsync();

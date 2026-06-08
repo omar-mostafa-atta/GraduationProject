@@ -20,5 +20,6 @@ namespace Health.Contracts.Requests.HomeServiceRequests
 
         [Required]
         public Guid? NurseId { get; set; }
+        public string Government { get; set; }
     }
 }
