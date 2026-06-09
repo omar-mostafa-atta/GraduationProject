@@ -22,5 +22,7 @@ namespace Health.Contracts.Requests.Auth
         public string WorkPlace { get; set; }
         [Required]
         public int ExperienceYears { get; set; }
+        [Required]
+        public string Location { get; set; }
     }
 }

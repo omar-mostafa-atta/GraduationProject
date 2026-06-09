@@ -130,6 +130,7 @@ namespace Health.Application.Services
                     ExperienceYears = request.ExperienceYears,
                     Email = request.Email,
                     Status = DoctorStatus.Pending,
+                    Location= request.Location,
                     User = user
                 };
 
