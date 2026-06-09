@@ -62,6 +62,7 @@ namespace Health.Application.Services
                     if (!string.IsNullOrWhiteSpace(request.ProfilePictureUrl)) doctor.ProfilePictureUrl = request.ProfilePictureUrl;
                     if (!string.IsNullOrWhiteSpace(request.Education)) doctor.Education = request.Education;
                     if (!string.IsNullOrWhiteSpace(request.Certifications)) doctor.Certification = request.Certifications;
+                    if (!string.IsNullOrWhiteSpace(request.Bio)) doctor.Bio = request.Bio;
                 }
             }
             else if (roles.Contains("Nurse"))
@@ -75,6 +76,7 @@ namespace Health.Application.Services
                     if (!string.IsNullOrWhiteSpace(request.ProfilePictureUrl)) nurse.ProfilePictureUrl = request.ProfilePictureUrl;
                     if (!string.IsNullOrWhiteSpace(request.Education)) nurse.Education = request.Education;
                     if (!string.IsNullOrWhiteSpace(request.Certifications)) nurse.Certification = request.Certifications;
+                    if (!string.IsNullOrWhiteSpace(request.Bio)) nurse.Bio = request.Bio;
                 }
             }
 
@@ -173,7 +175,8 @@ namespace Health.Application.Services
                 CompletedRequests = nurse.CompletedRequests,
                 Government = nurse.Government,
                 Education = nurse.Education,
-                Certifications = nurse.Certification
+                Certifications = nurse.Certification,
+                Bio = nurse.Bio
 
             };
         }

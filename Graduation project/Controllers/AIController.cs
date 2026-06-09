@@ -19,17 +19,55 @@ namespace Graduation_project.Controllers
         [HttpGet("GetAICalories")]
         public async Task<IActionResult> Get(string food)
         {
-            var url = "https://mennaelzyat-wateen-nutrition-api.hf.space/ask/text";
+            var url = "https://mennaelzyat-ai-nutiration-wateen.hf.space/ask/text";
             var response = await _httpClient.PostAsJsonAsync(url, new { 
-                message = $"how much calories of {food}" 
-            });
+                message = food
+
+        });
             if (!response.IsSuccessStatusCode)
             {
                 return BadRequest(await response.Content.ReadAsStringAsync());
             }
-       
-               
-            return Ok(await response.Content.ReadFromJsonAsync<AiCaloriesResponse>());
+
+
+            var result = await response.Content.ReadFromJsonAsync<AiCaloriesResponse>();
+            return Ok(result);
+
+        }
+        [HttpPost("GetAICaloriesByImage")]
+        public async Task<IActionResult> GetAICaloriesByImage(IFormFile image, [FromForm] string? message)
+        {
+            if (image == null || image.Length == 0)
+            {
+                return BadRequest("Please upload the meal image.");
+            }
+
+            var url = "https://mennaelzyat-ai-nutiration-wateen.hf.space/ask/image";
+
+            using var content = new MultipartFormDataContent();
+
+            using var stream = image.OpenReadStream();
+            var fileContent = new StreamContent(stream);
+
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(image.ContentType);
+
+            content.Add(fileContent, "image", image.FileName);
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                
+                content.Add(new StringContent(message), "message");
+            }
+
+            var response = await _httpClient.PostAsync(url, content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return BadRequest(await response.Content.ReadAsStringAsync());
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<AiCaloriesResponse>();
+            return Ok(result);
         }
 
         [HttpGet("GetAiDiagnose")]

@@ -20,6 +20,7 @@ namespace Health.Contracts.Responses.Profile
         public string? Government { get; set; }
         public string? Education { get; set; }
         public string? Certifications { get; set; }
+        public string? Bio { get; set; }
     }
 
     

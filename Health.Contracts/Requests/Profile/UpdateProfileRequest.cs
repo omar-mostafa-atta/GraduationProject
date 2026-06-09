@@ -13,6 +13,7 @@ namespace Health.Contracts.Requests.Profile
         public string? ProfilePictureUrl { get; set; }
         public string? Education { get; set; }
         public string? Certifications { get; set; }
+        public string? Bio { get; set; }
     }
 
     public class UpdatePatientProfileRequest : UpdateProfileRequest

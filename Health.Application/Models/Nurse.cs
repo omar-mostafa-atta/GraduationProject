@@ -22,7 +22,7 @@ namespace Health.Application.Models
         public string? Education { get; set; }
         public string? Certification { get; set; }
         public string? Government { get; set; }=null;
-
+        public string? Bio { get; set; }
         public NurseStatus Status { get; set; }= NurseStatus.Pending;
 
         public ICollection<HomeServiceRequest> HomeServiceRequests { get; set; }
