@@ -41,7 +41,14 @@ namespace Health.Application.Services
                 throw new Exception("Patient record not found for this user.");
             }
 
-
+            if (request.NurseId.HasValue)
+            {
+                var nurseExists = await _dbContext.Nurses.AnyAsync(n => n.Id == request.NurseId.Value);
+                if (!nurseExists)
+                {
+                    throw new Exception($"The assigned Nurse with ID '{request.NurseId}' does not exist.");
+                }
+            }
             var serviceRequest = new HomeServiceRequest
             {
                 Id = Guid.NewGuid(),
@@ -300,7 +307,8 @@ namespace Health.Application.Services
                 Specialization = n.Specialization,
                 ExperienceYears = n.ExperienceYears,
                 ProfilePictureUrl = n.User.ProfilePictureUrl,
-                PhoneNumber = n.PhoneNumber
+                PhoneNumber = n.PhoneNumber,
+                CompletedRequests= n.CompletedRequests
             }).ToList();
 
             return new PaginatedResponse<NurseResponse>

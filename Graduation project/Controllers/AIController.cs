@@ -20,10 +20,11 @@ namespace Graduation_project.Controllers
         public async Task<IActionResult> Get(string food)
         {
             var url = "https://mennaelzyat-ai-nutiration-wateen.hf.space/ask/text";
-            var response = await _httpClient.PostAsJsonAsync(url, new { 
+            var response = await _httpClient.PostAsJsonAsync(url, new
+            {
                 message = food
 
-        });
+            });
             if (!response.IsSuccessStatusCode)
             {
                 return BadRequest(await response.Content.ReadAsStringAsync());
@@ -55,7 +56,7 @@ namespace Graduation_project.Controllers
 
             if (!string.IsNullOrEmpty(message))
             {
-                
+
                 content.Add(new StringContent(message), "message");
             }
 
@@ -74,15 +75,16 @@ namespace Graduation_project.Controllers
         public async Task<IActionResult> GetAiDiagnose(string symptoms)
         {
             var url = "https://mennaelzyat-wateen-diseasepredication.hf.space/diagnose";
-            var response = await _httpClient.PostAsJsonAsync(url, new {
-                text = $"{symptoms}" 
+            var response = await _httpClient.PostAsJsonAsync(url, new
+            {
+                text = $"{symptoms}"
             });
             if (!response.IsSuccessStatusCode)
             {
                 return BadRequest(await response.Content.ReadAsStringAsync());
             }
-       
-               
+
+
             return Ok(await response.Content.ReadFromJsonAsync<AiDiagnoseResponse>());
         }
     }

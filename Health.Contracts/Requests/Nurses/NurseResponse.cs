@@ -8,5 +8,6 @@
         public int ExperienceYears { get; set; }
         public string? ProfilePictureUrl { get; set; }
         public string? PhoneNumber { get; set; }
+        public int CompletedRequests { get; set; }
     }
 }
