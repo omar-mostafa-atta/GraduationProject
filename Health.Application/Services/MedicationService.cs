@@ -40,6 +40,7 @@ namespace Health.Application.Services
                 Frequency = request.Frequency,
                 Duration = request.Duration,
                 Instructions = request.Instructions,
+                NextReminderTime = request.StartDate,
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
                 IsActive = true,
@@ -72,6 +73,11 @@ namespace Health.Application.Services
 
             if (medication.DoctorId != doctor.Id)
                 throw new Exception("Not authorized.");
+
+            if (medication.StartDate != request.StartDate)
+            {
+                medication.NextReminderTime = request.StartDate;
+            }
 
             medication.Name = request.Name;
             medication.Dosage = request.Dosage;

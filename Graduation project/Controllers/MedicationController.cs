@@ -1,7 +1,9 @@
-﻿using Health.Application.IServices;
+﻿using Graduation_project.Hubs;
+using Health.Application.IServices;
 using Health.Contracts.Requests.Medications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace Graduation_project.Controllers
@@ -12,10 +14,13 @@ namespace Graduation_project.Controllers
     public class MedicationController : ControllerBase
     {
         private readonly IMedicationService _medicationService;
-
-        public MedicationController(IMedicationService medicationService)
+        private readonly INotificationService _notificationService;
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public MedicationController(IMedicationService medicationService, INotificationService notificationService, IHubContext<NotificationHub> hubContext)
         {
             _medicationService = medicationService;
+            _notificationService = notificationService;
+            _hubContext = hubContext;
         }
 
         // الدكتور يضيف Medication لمريض
@@ -29,6 +34,17 @@ namespace Graduation_project.Controllers
             try
             {
                 var response = await _medicationService.AddMedicationAsync(userId, request);
+                var title = "New Prescription Added";
+                var message = $"Dr. {response.DoctorName} prescribed you {response.Name}.";
+                var notification = await _notificationService.CreateNotificationAsync(
+                response.PatientId,
+                title,
+                message,
+                "system");
+                if (NotificationHub.OnlineUsers.TryGetValue(response.PatientId.ToString(), out var connectionId))
+                {
+                    await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", notification);
+                }
                 return Ok(response);
             }
             catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }

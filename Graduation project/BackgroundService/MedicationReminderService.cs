@@ -51,83 +51,53 @@ namespace Graduation_project.BackgroundServices
             var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
             var now = DateTime.UtcNow;
-            var todayUtc = now.Date;
 
-            // Load all active medications with patient user info
-            var medications = await dbContext.Medications
-                .Include(m => m.Patient)
-                    .ThenInclude(p => p.User)
+            // Find medications due right now
+            var dueMedications = await dbContext.Medications
+                .Include(m => m.Patient).ThenInclude(p => p.User)
                 .Where(m => m.IsActive
-                    && m.StartDate.Date <= todayUtc
-                    && (m.EndDate == null || m.EndDate.Value.Date >= todayUtc))
+                         && m.NextReminderTime.HasValue
+                         && m.NextReminderTime.Value <= now
+                         && (m.EndDate == null || m.NextReminderTime.Value <= m.EndDate))
                 .ToListAsync();
 
-            foreach (var medication in medications)
+            foreach (var medication in dueMedications)
             {
-                var reminderTimes = GetReminderTimes(medication.Frequency); // e.g. [8, 20]
+                var userId = medication.Patient.User.Id;
+                var title = $"💊 Time to take {medication.Name}";
+                var message = $"Dosage: {medication.Dosage}. {medication.Instructions}";
 
-                foreach (var hour in reminderTimes)
+                // Send the real-time notification
+                var notification = await notificationService.CreateNotificationAsync(userId, title, message, "reminder");
+
+                if (NotificationHub.OnlineUsers.TryGetValue(userId.ToString(), out var connectionId))
                 {
-                    // Check if current hour matches and we're within the first minute of that hour
-                    if (now.Hour != hour || now.Minute != 0)
-                        continue;
-
-                    // Avoid duplicate: check if we already sent this reminder today
-                    var alreadySent = await dbContext.Notifications.AnyAsync(n =>
-                        n.UserId == medication.Patient.User.Id
-                        && n.Type == "reminder"
-                        && n.Title.Contains(medication.Name)
-                        && n.CreatedAt.Date == todayUtc
-                        && n.CreatedAt.Hour == hour);
-
-                    if (alreadySent) continue;
-
-                    var userId = medication.Patient.User.Id;
-                    var title = $"💊 Time to take {medication.Name}";
-                    var message = $"Dosage: {medication.Dosage}. {medication.Instructions}";
-
-                    // Save to DB
-                    var notification = await notificationService
-                        .CreateNotificationAsync(userId, title, message, "reminder");
-
-                    // Push real-time via SignalR if user is online
-                    var userIdStr = userId.ToString();
-                    if (NotificationHub.OnlineUsers.TryGetValue(userIdStr, out var connectionId))
+                    await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", new
                     {
-                        await _hubContext.Clients.Client(connectionId)
-                            .SendAsync("ReceiveNotification", new
-                            {
-                                notification.Id,
-                                notification.Title,
-                                notification.Message,
-                                notification.Type,
-                                notification.IsRead,
-                                notification.CreatedAt
-                            });
-                    }
+                        notification.Id,
+                        notification.Title,
+                        notification.Message,
+                        notification.Type,
+                        notification.IsRead,
+                        notification.CreatedAt
+                    });
+                }
 
-                    _logger.LogInformation(
-                        "Sent medication reminder to user {UserId} for {MedicationName}",
-                        userId, medication.Name);
+                // Schedule the next reminder using your integer Frequency
+                medication.NextReminderTime = medication.NextReminderTime.Value.AddHours(medication.Frequency);
+
+                // Auto-complete if it passes the EndDate
+                if (medication.EndDate.HasValue && medication.NextReminderTime > medication.EndDate.Value)
+                {
+                    medication.NextReminderTime = null;
+                    medication.IsActive = false;
                 }
             }
-        }
 
-        /// <summary>
-        /// Returns UTC hours when reminders should fire based on frequency string.
-        /// Adjust these hours to match your users' timezone if needed.
-        /// </summary>
-        private static List<int> GetReminderTimes(string frequency)
-        {
-            return frequency?.ToLower() switch
+            if (dueMedications.Any())
             {
-                "once daily" => new List<int> { 8 },
-                "twice daily" => new List<int> { 8, 20 },
-                "three times" => new List<int> { 8, 14, 20 },
-                "every 8 hours" => new List<int> { 8, 16, 0 },
-                "every 12 hours" => new List<int> { 8, 20 },
-                _ => new List<int> { 8 } // default: morning
-            };
+                await dbContext.SaveChangesAsync();
+            }
         }
     }
 }

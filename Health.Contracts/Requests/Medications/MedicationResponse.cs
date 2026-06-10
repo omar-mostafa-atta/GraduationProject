@@ -8,7 +8,7 @@
         public string DoctorName { get; set; }
         public string Name { get; set; }
         public string Dosage { get; set; }
-        public string Frequency { get; set; }
+        public int Frequency { get; set; }
         public string Duration { get; set; }
         public string Instructions { get; set; }
         public DateTime StartDate { get; set; }

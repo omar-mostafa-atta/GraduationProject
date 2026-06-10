@@ -18,8 +18,9 @@ namespace Health.Application.Models
 
         public string Name { get; set; }
         public string Dosage { get; set; }
-        public string Frequency { get; set; }       // Once daily / Twice daily
-        public string Duration { get; set; }         // Ongoing / أو تاريخ معين
+        public int Frequency { get; set; }
+        public DateTime? NextReminderTime { get; set; }
+        public string Duration { get; set; }
         public string Instructions { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }

@@ -14,7 +14,7 @@ namespace Health.Contracts.Requests.Medications
         public string Dosage { get; set; }
 
         [Required]
-        public string Frequency { get; set; }
+        public int Frequency { get; set; }
 
         [Required]
         public string Duration { get; set; }

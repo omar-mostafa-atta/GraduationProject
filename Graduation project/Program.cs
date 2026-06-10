@@ -57,7 +57,7 @@ builder.Services.AddAuthentication(options =>
         {
             var accessToken = context.Request.Query["access_token"];
             var path = context.HttpContext.Request.Path;
-            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+            if (!string.IsNullOrEmpty(accessToken) &&( path.StartsWithSegments("/hubs/chat") || path.StartsWithSegments("/hubs/notifications")))
             {
                
                 context.Token = accessToken;
@@ -125,12 +125,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.SetIsOriginAllowed(_ => true) 
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();           
     });
-
-
 });
 
 

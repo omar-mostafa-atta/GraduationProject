@@ -1,7 +1,9 @@
 ﻿// Graduation_project/Controllers/NotificationController.cs
+using Graduation_project.Hubs;
 using Health.Application.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace Graduation_project.Controllers
@@ -64,6 +66,37 @@ namespace Graduation_project.Controllers
                 return Ok(new { Message = "All notifications marked as read." });
             }
             catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+        }
+        [HttpPost("test-send")]
+        public async Task<IActionResult> TestSendNotification([FromServices] IHubContext<NotificationHub> hubContext)
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdStr == null) return Unauthorized();
+
+            var userId = Guid.Parse(userIdStr);
+
+            // 1. Save to DB
+            var notification = await _notificationService.CreateNotificationAsync(
+                userId,
+                "🧪 Test Alert",
+                "If you see this, SignalR is working perfectly!",
+                "system");
+
+            // 2. Push to SignalR
+            if (NotificationHub.OnlineUsers.TryGetValue(userIdStr, out var connectionId))
+            {
+                await hubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", new
+                {
+                    notification.Id,
+                    notification.Title,
+                    notification.Message,
+                    notification.Type,
+                    notification.IsRead,
+                    notification.CreatedAt
+                });
+            }
+
+            return Ok(new { Message = "Test notification fired!" });
         }
     }
 }
