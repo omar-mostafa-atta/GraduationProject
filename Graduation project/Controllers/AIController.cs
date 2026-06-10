@@ -35,6 +35,7 @@ namespace Graduation_project.Controllers
             return Ok(result);
 
         }
+
         [HttpPost("GetAICaloriesByImage")]
         public async Task<IActionResult> GetAICaloriesByImage(IFormFile image, [FromForm] string? message)
         {
