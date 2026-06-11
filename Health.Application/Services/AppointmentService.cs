@@ -372,7 +372,9 @@ namespace Health.Application.Services
                 Bio = d.Bio,
                 ProfilePictureUrl = d.User.ProfilePictureUrl,
                 PhoneNumber = d.PhoneNumber,
-                ExperienceYears = d.ExperienceYears
+                ExperienceYears = d.ExperienceYears,
+                Education = d.Education,        
+                Certification = d.Certification
 
             }).ToList();
 
