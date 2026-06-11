@@ -37,6 +37,8 @@ namespace Health.Application.Models
 
         public ICollection<Appointment> Appointments { get; set; }
         public ICollection<MedicalTask> MedicalTasks { get; set; }
+        public ICollection<Medication> Medications { get; set; }
+        public ICollection<MedicalRecord> MedicalRecords { get; set; }
         public string Location { get; set; }
     }
     public enum DoctorStatus

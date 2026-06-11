@@ -335,10 +335,30 @@ namespace Health.Application.Services
             }
             else if (isDoctor)
             {
-                var doctor = await _dbContext.Doctors.SingleOrDefaultAsync(d => d.Id == user.Id);
+                var doctor = await _dbContext.Doctors
+                    .Include(d => d.Appointments)
+                    .Include(d => d.MedicalTasks)
+                    .Include(d => d.Medications)
+                    .Include(d => d.MedicalRecords)
+                    .SingleOrDefaultAsync(d => d.Id == user.Id);
+
                 if (doctor != null)
                 {
+                    // امسح الـ related data الأول
+                    if (doctor.Appointments != null)
+                        _dbContext.Appointments.RemoveRange(doctor.Appointments);
+
+                    if (doctor.MedicalTasks != null)
+                        _dbContext.MedicalTasks.RemoveRange(doctor.MedicalTasks);
+
+                    if (doctor.Medications != null)
+                        _dbContext.Medications.RemoveRange(doctor.Medications);
+
+                    if (doctor.MedicalRecords != null)
+                        _dbContext.MedicalRecords.RemoveRange(doctor.MedicalRecords);
+
                     _dbContext.Doctors.Remove(doctor);
+                    await _dbContext.SaveChangesAsync();
                 }
             }
             else if (isNurse)
